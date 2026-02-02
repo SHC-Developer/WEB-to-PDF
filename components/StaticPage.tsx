@@ -1,5 +1,6 @@
 import React from 'react';
 import { Page, EditorElement } from '../types';
+import { PAGE_WIDTH, PAGE_HEIGHT } from '../constants';
 
 interface StaticPageProps {
   page: Page;
@@ -37,13 +38,27 @@ export const StaticPage: React.FC<StaticPageProps> = ({ page }) => {
            )}
 
            {element.type === 'image' && (
-             <img 
-               src={element.content} 
-               alt="" 
+             <div
                className="w-full h-full"
-               style={{ objectFit: element.styles.objectFit || 'cover' }}
-               crossOrigin="anonymous" // Important for html2canvas
-             />
+               style={{
+                 display: 'flex',
+                 alignItems: 'center',
+                 justifyContent: 'center',
+                 overflow: 'hidden',
+               }}
+             >
+               <img
+                 src={element.content}
+                 alt=""
+                 crossOrigin="anonymous"
+                 style={{
+                   maxWidth: '100%',
+                   maxHeight: '100%',
+                   width: 'auto',
+                   height: 'auto',
+                 }}
+               />
+             </div>
            )}
 
            {element.type === 'shape' && (
@@ -54,17 +69,39 @@ export const StaticPage: React.FC<StaticPageProps> = ({ page }) => {
     );
   };
 
-  return (
-    <div 
-      className="relative overflow-hidden bg-white"
-      style={{ 
-        width: '595px', 
-        height: '842px', 
-        backgroundColor: page.backgroundColor 
+  const margin = page.contentArea?.margin ?? 0;
+  const contentBg = page.contentArea?.backgroundColor ?? 'transparent';
+  const contentWidth = PAGE_WIDTH - 2 * margin;
+  const contentHeight = PAGE_HEIGHT - 2 * margin;
+
+  const contentArea = margin > 0 ? (
+    <div
+      className="relative overflow-hidden"
+      style={{
+        position: 'absolute',
+        left: margin,
+        top: margin,
+        width: contentWidth,
+        height: contentHeight,
+        backgroundColor: contentBg,
       }}
     >
-      {/* Background Grid is NOT rendered for PDF */}
       {page.elements.map(renderElement)}
+    </div>
+  ) : (
+    page.elements.map(renderElement)
+  );
+
+  return (
+    <div
+      className="relative overflow-hidden bg-white"
+      style={{
+        width: `${PAGE_WIDTH}px`,
+        height: `${PAGE_HEIGHT}px`,
+        backgroundColor: page.backgroundColor,
+      }}
+    >
+      {contentArea}
     </div>
   );
 };

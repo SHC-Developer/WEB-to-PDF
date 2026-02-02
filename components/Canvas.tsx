@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Page, EditorElement } from '../types';
+import { PAGE_WIDTH, PAGE_HEIGHT } from '../constants';
 import { Icons } from './Icons';
 
 interface CanvasProps {
@@ -7,8 +8,8 @@ interface CanvasProps {
   secondPage?: Page | null; // For double page view
   scale: number;
   showGrid: boolean;
-  selectedElementId: string | null;
-  onSelectElement: (id: string | null) => void;
+  selectedElementIds: string[];
+  onSelectElements: (ids: string[]) => void;
   onUpdateElement: (id: string, updates: Partial<EditorElement>) => void;
   onRecordChange: () => void;
 }
@@ -23,19 +24,23 @@ export const Canvas: React.FC<CanvasProps> = ({
   secondPage, 
   scale, 
   showGrid,
-  selectedElementId,
-  onSelectElement,
+  selectedElementIds,
+  onSelectElements,
   onUpdateElement,
   onRecordChange
 }) => {
+  const selectedElementId = selectedElementIds[0] ?? null;
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [isRotating, setIsRotating] = useState(false);
-  
+  const [draggingElementId, setDraggingElementId] = useState<string | null>(null);
+
   // Snap lines state
   const [snapLines, setSnapLines] = useState<SnapLine[]>([]);
-  // To ensure we render snap lines on the correct page
   const [activeSnapPageId, setActiveSnapPageId] = useState<string | null>(null);
+
+  // Marquee selection (PPT-style box select)
+  const [marquee, setMarquee] = useState<{ pageId: string; startX: number; startY: number; endX: number; endY: number } | null>(null);
 
   const canvasRef = useRef<HTMLDivElement>(null);
 
@@ -43,8 +48,16 @@ export const Canvas: React.FC<CanvasProps> = ({
   const handleMouseDown = (e: React.MouseEvent, element: EditorElement, pageId: string, handleType?: string) => {
     e.stopPropagation();
     
-    // Always select the element, even if locked
-    onSelectElement(element.id);
+    // Select: Ctrl = add to selection, else replace
+    if (e.ctrlKey || e.metaKey) {
+      if (selectedElementIds.includes(element.id)) {
+        onSelectElements(selectedElementIds.filter(id => id !== element.id));
+      } else {
+        onSelectElements([...selectedElementIds, element.id]);
+      }
+    } else {
+      onSelectElements([element.id]);
+    }
 
     // If locked, prevent dragging/resizing/rotating
     if (element.locked) return;
@@ -67,9 +80,9 @@ export const Canvas: React.FC<CanvasProps> = ({
 
     // Prepare Snap Targets (only for dragging currently to keep it simple and robust)
     // Vertical Lines (X coordinates)
-    const snapTargetsX: number[] = [0, 595 / 2, 595]; // Page Left, Center, Right
+    const snapTargetsX: number[] = [0, PAGE_WIDTH / 2, PAGE_WIDTH]; // Page Left, Center, Right
     // Horizontal Lines (Y coordinates)
-    const snapTargetsY: number[] = [0, 842 / 2, 842]; // Page Top, Middle, Bottom
+    const snapTargetsY: number[] = [0, PAGE_HEIGHT / 2, PAGE_HEIGHT]; // Page Top, Middle, Bottom
 
     currentPage.elements.forEach(el => {
       if (el.id === element.id) return;
@@ -81,18 +94,28 @@ export const Canvas: React.FC<CanvasProps> = ({
 
     if (handleType === 'rotate') {
       setIsRotating(true);
+      const ROTATE_SNAP_DEGREES = [0, 30, 45, 60, 90, 120, 135, 150, 180, 210, 225, 240, 270, 300, 315, 330];
+      const snapAngularDist = (a: number, b: number) => Math.abs(((a - b + 540) % 360) - 180);
+      const startRotation = element.rotation ?? 0;
       const onMouseMove = (moveEvent: MouseEvent) => {
         const rect = (moveEvent.target as HTMLElement).closest('.element-wrapper')?.getBoundingClientRect();
         if (rect) {
           const centerX = rect.left + rect.width / 2;
           const centerY = rect.top + rect.height / 2;
           const radians = Math.atan2(moveEvent.clientY - centerY, moveEvent.clientX - centerX);
-          const degrees = (radians * (180 / Math.PI)) + 90; // +90 to align with top handle
+          let degrees = (radians * (180 / Math.PI)) + 90;
+          degrees = ((degrees % 360) + 360) % 360;
+          if (moveEvent.shiftKey) {
+            degrees = ROTATE_SNAP_DEGREES.reduce((prev, d) =>
+              snapAngularDist(degrees, d) < snapAngularDist(degrees, prev) ? d : prev
+            );
+          }
           onUpdateElement(element.id, { rotation: degrees });
         }
       };
       const onMouseUp = () => {
         setIsRotating(false);
+        setDraggingElementId(null);
         setSnapLines([]);
         setActiveSnapPageId(null);
         document.removeEventListener('mousemove', onMouseMove);
@@ -102,22 +125,69 @@ export const Canvas: React.FC<CanvasProps> = ({
       document.addEventListener('mouseup', onMouseUp);
 
     } else if (handleType) {
-      // Resizing
+      // Resizing (Shift: lock aspect ratio)
       setIsResizing(true);
-      
+      const startAspectRatio = startWidth / startHeight;
+
       const onMouseMove = (moveEvent: MouseEvent) => {
         const deltaX = (moveEvent.clientX - startX) / scale;
         const deltaY = (moveEvent.clientY - startY) / scale;
-        
+        const lockRatio = moveEvent.shiftKey;
+
         let newX = startElX;
         let newY = startElY;
         let newWidth = startWidth;
         let newHeight = startHeight;
 
-        if (handleType.includes('e')) newWidth = startWidth + deltaX;
-        if (handleType.includes('w')) { newX = startElX + deltaX; newWidth = startWidth - deltaX; }
-        if (handleType.includes('s')) newHeight = startHeight + deltaY;
-        if (handleType.includes('n')) { newY = startElY + deltaY; newHeight = startHeight - deltaY; }
+        if (lockRatio) {
+          const isCorner = handleType.length === 2;
+          if (isCorner) {
+            if (handleType === 'se') {
+              newWidth = startWidth + deltaX;
+              newHeight = newWidth / startAspectRatio;
+            }
+            if (handleType === 'sw') {
+              newWidth = startWidth - deltaX;
+              newHeight = newWidth / startAspectRatio;
+              newX = startElX + startWidth - newWidth;
+            }
+            if (handleType === 'ne') {
+              newHeight = startHeight - deltaY;
+              newWidth = newHeight * startAspectRatio;
+              newY = startElY + startHeight - newHeight;
+            }
+            if (handleType === 'nw') {
+              newWidth = startWidth - deltaX;
+              newHeight = newWidth / startAspectRatio;
+              newX = startElX + startWidth - newWidth;
+              newY = startElY + startHeight - newHeight;
+            }
+          } else {
+            if (handleType.includes('e')) {
+              newWidth = startWidth + deltaX;
+              newHeight = newWidth / startAspectRatio;
+            }
+            if (handleType.includes('w')) {
+              newWidth = startWidth - deltaX;
+              newHeight = newWidth / startAspectRatio;
+              newX = startElX + startWidth - newWidth;
+            }
+            if (handleType.includes('s')) {
+              newHeight = startHeight + deltaY;
+              newWidth = newHeight * startAspectRatio;
+            }
+            if (handleType.includes('n')) {
+              newHeight = startHeight - deltaY;
+              newWidth = newHeight * startAspectRatio;
+              newY = startElY + startHeight - newHeight;
+            }
+          }
+        } else {
+          if (handleType.includes('e')) newWidth = startWidth + deltaX;
+          if (handleType.includes('w')) { newX = startElX + deltaX; newWidth = startWidth - deltaX; }
+          if (handleType.includes('s')) newHeight = startHeight + deltaY;
+          if (handleType.includes('n')) { newY = startElY + deltaY; newHeight = startHeight - deltaY; }
+        }
 
         if (newWidth > 10 && newHeight > 10) {
           onUpdateElement(element.id, { x: newX, y: newY, width: newWidth, height: newHeight });
@@ -126,6 +196,7 @@ export const Canvas: React.FC<CanvasProps> = ({
 
       const onMouseUp = () => {
         setIsResizing(false);
+        setDraggingElementId(null);
         setSnapLines([]);
         setActiveSnapPageId(null);
         document.removeEventListener('mousemove', onMouseMove);
@@ -137,6 +208,7 @@ export const Canvas: React.FC<CanvasProps> = ({
     } else {
       // Dragging with Snap
       setIsDragging(true);
+      setDraggingElementId(element.id);
       // setDragOffset({ x: e.clientX - element.x * scale, y: e.clientY - element.y * scale });
       
       const onMouseMove = (moveEvent: MouseEvent) => {
@@ -225,15 +297,26 @@ export const Canvas: React.FC<CanvasProps> = ({
         }
 
         setSnapLines(finalSnapLines);
-        
-        onUpdateElement(element.id, {
-          x: snappedX,
-          y: snappedY
-        });
+
+        const snapDeltaX = snappedX - startElX;
+        const snapDeltaY = snappedY - startElY;
+        if (selectedElementIds.includes(element.id) && selectedElementIds.length > 1) {
+          selectedElementIds.forEach(id => {
+            if (id === element.id) {
+              onUpdateElement(id, { x: snappedX, y: snappedY });
+            } else {
+              const other = currentPage.elements.find(el => el.id === id);
+              if (other) onUpdateElement(id, { x: other.x + snapDeltaX, y: other.y + snapDeltaY });
+            }
+          });
+        } else {
+          onUpdateElement(element.id, { x: snappedX, y: snappedY });
+        }
       };
 
       const onMouseUp = () => {
         setIsDragging(false);
+        setDraggingElementId(null);
         setSnapLines([]);
         setActiveSnapPageId(null);
         document.removeEventListener('mousemove', onMouseMove);
@@ -245,8 +328,10 @@ export const Canvas: React.FC<CanvasProps> = ({
   };
 
   const renderElement = (element: EditorElement, pageId: string) => {
-    const isSelected = selectedElementId === element.id;
-    
+    const isSelected = selectedElementIds.includes(element.id);
+    const isBeingDragged = draggingElementId === element.id;
+    const blockPointerDuringDrag = (isDragging || isResizing || isRotating) && !isBeingDragged;
+
     return (
       <div
         key={element.id}
@@ -258,7 +343,8 @@ export const Canvas: React.FC<CanvasProps> = ({
           height: element.height,
           transform: `rotate(${element.rotation || 0}deg)`,
           cursor: element.locked ? 'default' : 'move',
-          zIndex: element.styles.zIndex
+          zIndex: element.styles.zIndex,
+          pointerEvents: blockPointerDuringDrag ? 'none' : undefined,
         }}
         onMouseDown={(e) => handleMouseDown(e, element, pageId)}
       >
@@ -271,23 +357,31 @@ export const Canvas: React.FC<CanvasProps> = ({
         >
            {element.type === 'text' && (
              <div className="w-full h-full break-words whitespace-pre-wrap outline-none" 
-                contentEditable={isSelected && !element.locked}
+                contentEditable={isSelected && selectedElementIds.length === 1 && !element.locked}
                 suppressContentEditableWarning
                 onFocus={() => onRecordChange()}
                 onBlur={(e) => onUpdateElement(element.id, { content: e.currentTarget.innerText })}
                 style={{ 
                    cursor: 'text',
                    display: 'flex',
-                   alignItems: 'center', 
-                   pointerEvents: isSelected && !isDragging ? 'auto' : 'none'
+                   alignItems: element.styles.alignItems || 'center',
+                   pointerEvents: isSelected && selectedElementIds.length === 1 && !isDragging ? 'auto' : 'none',
+                   width: '100%'
                 }}
              >
-               {element.content}
+               <span className="break-words whitespace-pre-wrap" style={{ width: '100%', display: 'block', textAlign: element.styles.textAlign || 'left' }}>
+                 {element.content}
+               </span>
              </div>
            )}
 
            {element.type === 'image' && (
-             <img src={element.content} alt="" className="w-full h-full object-cover pointer-events-none" />
+             <img
+               src={element.content}
+               alt=""
+               className="w-full h-full pointer-events-none"
+               style={{ objectFit: element.styles.objectFit ?? 'contain' }}
+             />
            )}
 
            {element.type === 'shape' && (
@@ -308,8 +402,8 @@ export const Canvas: React.FC<CanvasProps> = ({
            </div>
         )}
 
-        {/* Resize/Rotate Handles - Only if not locked */}
-        {isSelected && !element.locked && (
+        {/* Resize/Rotate Handles - Only when single selection and not locked */}
+        {isSelected && selectedElementIds.length === 1 && !element.locked && (
           <>
             {/* Rotate Handle */}
             <div 
@@ -362,10 +456,50 @@ export const Canvas: React.FC<CanvasProps> = ({
     );
   };
 
+  // Marquee: start on page empty area mousedown
+  const handlePageMouseDown = (e: React.MouseEvent, pageId: string) => {
+    if ((e.target as HTMLElement).closest('.element-wrapper')) return;
+    e.stopPropagation();
+    const pageEl = e.currentTarget as HTMLElement;
+    const rect = pageEl.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / scale;
+    const y = (e.clientY - rect.top) / scale;
+    setMarquee({ pageId, startX: x, startY: y, endX: x, endY: y });
+    const onMove = (ev: MouseEvent) => {
+      const r = pageEl.getBoundingClientRect();
+      setMarquee(prev => prev ? { ...prev, endX: (ev.clientX - r.left) / scale, endY: (ev.clientY - r.top) / scale } : null);
+    };
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      setMarquee(m => {
+        if (!m) return null;
+        const curPage = m.pageId === page.id ? page : secondPage;
+        if (!curPage) return null;
+        const left = Math.min(m.startX, m.endX);
+        const right = Math.max(m.startX, m.endX);
+        const top = Math.min(m.startY, m.endY);
+        const bottom = Math.max(m.startY, m.endY);
+        const margin = curPage.contentArea?.margin ?? 0;
+        const ids = curPage.elements.filter(el => {
+          const elLeft = margin + el.x;
+          const elTop = margin + el.y;
+          const elRight = elLeft + el.width;
+          const elBottom = elTop + el.height;
+          return !(elLeft > right || elRight < left || elTop > bottom || elBottom < top);
+        }).map(el => el.id);
+        if (ids.length > 0) onSelectElements(ids);
+        return null;
+      });
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  };
+
   return (
     <div 
-      className="flex-1 bg-gray-200 overflow-auto flex items-center justify-center p-12 relative"
-      onClick={() => onSelectElement(null)}
+      className="flex-1 bg-gray-200 overflow-auto flex items-start justify-center p-12 relative"
+      onClick={() => onSelectElements([])}
       ref={canvasRef}
     >
       <div className={`flex gap-1 transition-transform duration-200 ease-out`} style={{ transform: `scale(${scale})` }}>
@@ -374,10 +508,13 @@ export const Canvas: React.FC<CanvasProps> = ({
         <div 
           className="bg-white shadow-xl relative overflow-hidden"
           style={{ 
-            width: '595px', height: '842px', // A4
+            width: `${PAGE_WIDTH}px`, height: `${PAGE_HEIGHT}px`,
             backgroundColor: page.backgroundColor
           }}
-          onClick={(e) => e.stopPropagation()}
+          onMouseDown={(e) => handlePageMouseDown(e, page.id)}
+          onClick={(e) => {
+            if ((e.target as HTMLElement).closest('.element-wrapper')) e.stopPropagation();
+          }}
         >
           {showGrid && (
             <div className="absolute inset-0 pointer-events-none z-0" 
@@ -388,8 +525,33 @@ export const Canvas: React.FC<CanvasProps> = ({
             />
           )}
           {showGrid && <div className="absolute top-0 left-0 w-full h-4 bg-gray-100 border-b border-gray-300 z-0 text-[8px] flex items-end px-1 text-gray-400">0px</div>}
-          
-          {page.elements.map(el => renderElement(el, page.id))}
+          {page.contentArea && page.contentArea.margin > 0 ? (
+            <div
+              className="absolute overflow-hidden"
+              style={{
+                left: page.contentArea.margin,
+                top: page.contentArea.margin,
+                width: PAGE_WIDTH - 2 * page.contentArea.margin,
+                height: PAGE_HEIGHT - 2 * page.contentArea.margin,
+                backgroundColor: page.contentArea.backgroundColor ?? '#f3f4f6',
+              }}
+            >
+              {page.elements.map(el => renderElement(el, page.id))}
+            </div>
+          ) : (
+            page.elements.map(el => renderElement(el, page.id))
+          )}
+          {marquee?.pageId === page.id && (
+            <div
+              className="absolute border-2 border-blue-500 bg-blue-500/10 pointer-events-none z-[70]"
+              style={{
+                left: Math.min(marquee.startX, marquee.endX),
+                top: Math.min(marquee.startY, marquee.endY),
+                width: Math.abs(marquee.endX - marquee.startX),
+                height: Math.abs(marquee.endY - marquee.startY),
+              }}
+            />
+          )}
           {renderSnapLines(page.id)}
         </div>
 
@@ -398,10 +560,13 @@ export const Canvas: React.FC<CanvasProps> = ({
           <div 
             className="bg-white shadow-xl relative overflow-hidden"
             style={{ 
-              width: '595px', height: '842px', // A4
+              width: `${PAGE_WIDTH}px`, height: `${PAGE_HEIGHT}px`,
               backgroundColor: secondPage.backgroundColor
             }}
-            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => handlePageMouseDown(e, secondPage.id)}
+            onClick={(e) => {
+              if ((e.target as HTMLElement).closest('.element-wrapper')) e.stopPropagation();
+            }}
           >
              {showGrid && (
               <div className="absolute inset-0 pointer-events-none z-0" 
@@ -411,7 +576,33 @@ export const Canvas: React.FC<CanvasProps> = ({
                   }} 
               />
             )}
-            {secondPage.elements.map(el => renderElement(el, secondPage.id))}
+            {secondPage.contentArea && secondPage.contentArea.margin > 0 ? (
+              <div
+                className="absolute overflow-hidden"
+                style={{
+                  left: secondPage.contentArea.margin,
+                  top: secondPage.contentArea.margin,
+                  width: PAGE_WIDTH - 2 * secondPage.contentArea.margin,
+                  height: PAGE_HEIGHT - 2 * secondPage.contentArea.margin,
+                  backgroundColor: secondPage.contentArea.backgroundColor ?? '#f3f4f6',
+                }}
+              >
+                {secondPage.elements.map(el => renderElement(el, secondPage.id))}
+              </div>
+            ) : (
+              secondPage.elements.map(el => renderElement(el, secondPage.id))
+            )}
+            {marquee?.pageId === secondPage.id && (
+              <div
+                className="absolute border-2 border-blue-500 bg-blue-500/10 pointer-events-none z-[70]"
+                style={{
+                  left: Math.min(marquee.startX, marquee.endX),
+                  top: Math.min(marquee.startY, marquee.endY),
+                  width: Math.abs(marquee.endX - marquee.startX),
+                  height: Math.abs(marquee.endY - marquee.startY),
+                }}
+              />
+            )}
             {renderSnapLines(secondPage.id)}
           </div>
         )}
@@ -421,7 +612,7 @@ export const Canvas: React.FC<CanvasProps> = ({
       {/* Floating Info */}
       <div className="absolute bottom-6 right-6 flex bg-white rounded shadow-lg border border-gray-200 text-xs">
          <div className="px-3 py-2 border-r border-gray-100 font-mono">
-            {selectedElementId ? `Selected: ${selectedElementId}` : 'No Selection'}
+            {selectedElementIds.length > 1 ? `${selectedElementIds.length}개 선택` : selectedElementId ? `Selected: ${selectedElementId}` : 'No Selection'}
          </div>
       </div>
     </div>

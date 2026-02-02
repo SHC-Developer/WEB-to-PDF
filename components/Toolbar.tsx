@@ -11,6 +11,7 @@ interface ToolbarProps {
   onUndo: () => void;
   onRedo: () => void;
   onSave: () => void;
+  onSaveProject?: () => void;
   isSaving?: boolean;
   onLoadBuiltInTemplate?: (templateId: string) => void;
   onLoadTemplateFromFile?: (file: File) => void;
@@ -19,6 +20,7 @@ interface ToolbarProps {
 const BUILT_IN_TEMPLATES = [
   { id: 'default', label: '기본 (PET Hospital)' },
   { id: 'catalog', label: 'Catalog (특허 카탈로그)' },
+  { id: 'catalog-renewal', label: 'Catalog 리뉴얼 (특허 카탈로그)' },
 ] as const;
 
 export const Toolbar: React.FC<ToolbarProps> = ({
@@ -27,6 +29,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   scale, setScale,
   onUndo, onRedo,
   onSave,
+  onSaveProject,
   isSaving = false,
   onLoadBuiltInTemplate,
   onLoadTemplateFromFile,
@@ -137,14 +140,24 @@ export const Toolbar: React.FC<ToolbarProps> = ({
            <button onClick={() => setScale(Math.min(2, scale + 0.1))} className="hover:text-blue-600 px-1">+</button>
         </div>
         
+        {onSaveProject && (
+          <button
+            onClick={onSaveProject}
+            className="px-4 py-2 rounded font-medium text-sm border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+            title="전체 페이지를 JSON 파일로 저장 (나중에 불러오기 가능)"
+          >
+            프로젝트 저장
+          </button>
+        )}
         <button 
           onClick={onSave}
           disabled={isSaving}
           className={`px-5 py-2 rounded font-medium text-sm transition-colors shadow-sm flex items-center gap-2
             ${isSaving ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#0091ff] hover:bg-[#007acc] text-white'}
           `}
+          title="PDF로 저장"
         >
-          {isSaving ? '저장 중...' : '저장'}
+          {isSaving ? '저장 중...' : 'PDF 저장'}
         </button>
       </div>
     </div>

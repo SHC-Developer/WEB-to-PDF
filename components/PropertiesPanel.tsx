@@ -1,14 +1,19 @@
 import React from 'react';
 import { Icons } from './Icons';
 import { EditorElement, Page } from '../types';
+import { PAGE_WIDTH, PAGE_HEIGHT } from '../constants';
 
 interface PropertiesPanelProps {
   selectedElement: EditorElement | null;
+  selectedElementIds: string[];
   activePage: Page;
   onUpdateElement: (id: string, updates: Partial<EditorElement>) => void;
   onUpdatePage: (updates: Partial<Page>) => void;
   onDeleteElement: (id: string) => void;
+  onDeleteSelected: () => void;
   onDuplicateElement: (id: string) => void;
+  onGroup: () => void;
+  onUngroup: () => void;
   onBringForward: (id: string) => void;
   onSendBackward: (id: string) => void;
   onRecordChange: () => void;
@@ -16,16 +21,45 @@ interface PropertiesPanelProps {
 
 export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ 
   selectedElement, 
+  selectedElementIds,
   activePage, 
   onUpdateElement,
   onUpdatePage,
   onDeleteElement,
+  onDeleteSelected,
   onDuplicateElement,
+  onGroup,
+  onUngroup,
   onBringForward,
   onSendBackward,
   onRecordChange
 }) => {
   
+  // Multiple selection: show group/ungroup and delete selected
+  if (selectedElementIds.length > 1) {
+    return (
+      <div className="w-[300px] bg-white border-l border-gray-200 flex flex-col h-full shrink-0 overflow-y-auto">
+        <div className="p-4 border-b border-gray-200">
+          <h3 className="font-bold text-gray-800 text-sm">{selectedElementIds.length}개 선택</h3>
+        </div>
+        <div className="p-4 space-y-3">
+          <p className="text-xs text-gray-500">빈 공간 드래그로 영역 선택 · Ctrl+클릭으로 추가/제외</p>
+          <div className="flex gap-2 flex-wrap">
+            <button onClick={() => { onRecordChange(); onGroup(); }} className="px-3 py-2 rounded border border-gray-200 text-sm hover:bg-gray-50">
+              그룹화
+            </button>
+            <button onClick={() => { onRecordChange(); onUngroup(); }} className="px-3 py-2 rounded border border-gray-200 text-sm hover:bg-gray-50">
+              그룹 해제
+            </button>
+            <button onClick={() => { onRecordChange(); onDeleteSelected(); }} className="px-3 py-2 rounded border border-red-200 text-red-600 text-sm hover:bg-red-50">
+              선택 삭제
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!selectedElement) {
     return (
       <div className="w-[300px] bg-white border-l border-gray-200 flex flex-col h-full shrink-0 overflow-y-auto">
@@ -119,12 +153,12 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
 
           <div className="flex gap-1 justify-between">
              <button onClick={() => { record(); onUpdateElement(selectedElement.id, { x: 0 }); }} className="p-1.5 border rounded hover:bg-gray-50" title="왼쪽 정렬"><Icons.AlignLeft size={16} /></button>
-             <button onClick={() => { record(); onUpdateElement(selectedElement.id, { x: 595/2 - selectedElement.width/2 }); }} className="p-1.5 border rounded hover:bg-gray-50" title="가운데 정렬"><Icons.AlignCenter size={16} /></button>
-             <button onClick={() => { record(); onUpdateElement(selectedElement.id, { x: 595 - selectedElement.width }); }} className="p-1.5 border rounded hover:bg-gray-50" title="오른쪽 정렬"><Icons.AlignRight size={16} /></button>
+             <button onClick={() => { record(); onUpdateElement(selectedElement.id, { x: PAGE_WIDTH/2 - selectedElement.width/2 }); }} className="p-1.5 border rounded hover:bg-gray-50" title="가운데 정렬"><Icons.AlignCenter size={16} /></button>
+             <button onClick={() => { record(); onUpdateElement(selectedElement.id, { x: PAGE_WIDTH - selectedElement.width }); }} className="p-1.5 border rounded hover:bg-gray-50" title="오른쪽 정렬"><Icons.AlignRight size={16} /></button>
              <div className="w-px bg-gray-300 mx-1"></div>
              <button onClick={() => { record(); onUpdateElement(selectedElement.id, { y: 0 }); }} className="p-1.5 border rounded hover:bg-gray-50" title="위쪽 정렬"><Icons.AlignTop size={16} className="rotate-90" /></button>
-             <button onClick={() => { record(); onUpdateElement(selectedElement.id, { y: 842/2 - selectedElement.height/2 }); }} className="p-1.5 border rounded hover:bg-gray-50" title="중간 정렬"><Icons.AlignMiddle size={16} className="rotate-90" /></button>
-             <button onClick={() => { record(); onUpdateElement(selectedElement.id, { y: 842 - selectedElement.height }); }} className="p-1.5 border rounded hover:bg-gray-50" title="아래쪽 정렬"><Icons.AlignBottom size={16} className="rotate-90" /></button>
+             <button onClick={() => { record(); onUpdateElement(selectedElement.id, { y: PAGE_HEIGHT/2 - selectedElement.height/2 }); }} className="p-1.5 border rounded hover:bg-gray-50" title="중간 정렬"><Icons.AlignMiddle size={16} className="rotate-90" /></button>
+             <button onClick={() => { record(); onUpdateElement(selectedElement.id, { y: PAGE_HEIGHT - selectedElement.height }); }} className="p-1.5 border rounded hover:bg-gray-50" title="아래쪽 정렬"><Icons.AlignBottom size={16} className="rotate-90" /></button>
           </div>
           
           <div className="grid grid-cols-2 gap-2">
@@ -188,6 +222,42 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                      {align === 'justify' && <Icons.AlignJustify size={16} />}
                    </button>
                 ))}
+             </div>
+
+             <div className="text-xs font-bold text-gray-700 mt-2">글자/줄 간격</div>
+             <div className="grid grid-cols-2 gap-2 items-start">
+               <div className="flex flex-col min-h-[4.5rem]">
+                 <label className="text-xs text-gray-500 block mb-1 h-4 flex-shrink-0">좌우 간격</label>
+                 <div className="flex items-center border border-gray-200 rounded px-2 h-9 flex-1 min-h-0">
+                   <input
+                     type="number"
+                     step={0.1}
+                     value={styles.letterSpacing ?? 0}
+                     onFocus={record}
+                     onChange={(e) => handleChange('styles', { letterSpacing: Number(e.target.value) })}
+                     className="w-full py-1.5 text-sm outline-none h-full min-h-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                     title="소수점 입력 가능 (예: 0.5, 1.2)"
+                   />
+                   <span className="text-xs text-gray-400 ml-1 flex-shrink-0">px</span>
+                 </div>
+               </div>
+               <div className="flex flex-col min-h-[4.5rem]">
+                 <label className="text-xs text-gray-500 block mb-1 h-4 flex-shrink-0">상하 간격</label>
+                 <div className="flex items-center border border-gray-200 rounded px-2 h-9 flex-1 min-h-0">
+                   <input
+                     type="number"
+                     step={0.01}
+                     min={0.5}
+                     max={3}
+                     value={styles.lineHeight ?? 1.2}
+                     onFocus={record}
+                     onChange={(e) => handleChange('styles', { lineHeight: Number(e.target.value) })}
+                     className="w-full py-1.5 text-sm outline-none h-full min-h-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                     title="소수점 입력 가능 (예: 1.25, 1.5)"
+                   />
+                   <span className="text-xs text-gray-400 ml-1 flex-shrink-0">배수</span>
+                 </div>
+               </div>
              </div>
           </div>
         )}

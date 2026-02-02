@@ -7,10 +7,10 @@
       {
         "id": "c1-bg",
         "type": "image",
-        "x": 331,
+        "x": 442,
         "y": 0,
-        "width": 264,
-        "height": 264,
+        "width": 352,
+        "height": 352,
         "content": "/assets/redblue.png",
         "styles": {
           "opacity": 0.05,
@@ -20,10 +20,10 @@
       {
         "id": "c1-logo",
         "type": "image",
-        "x": 51,
-        "y": 43,
-        "width": 120,
-        "height": 64,
+        "x": 68,
+        "y": 57,
+        "width": 160,
+        "height": 85,
         "content": "/assets/logo3.png",
         "styles": {
           "objectFit": "contain"
@@ -32,10 +32,10 @@
       {
         "id": "c1-eng",
         "type": "text",
-        "x": 51,
-        "y": 115,
-        "width": 280,
-        "height": 14,
+        "x": 68,
+        "y": 153,
+        "width": 374,
+        "height": 19,
         "content": "KOREA DISABLED VETERANS ASSOCIATION",
         "styles": {
           "fontSize": 12,
@@ -46,10 +46,10 @@
       {
         "id": "c1-org",
         "type": "text",
-        "x": 51,
-        "y": 132,
-        "width": 200,
-        "height": 20,
+        "x": 68,
+        "y": 176,
+        "width": 267,
+        "height": 27,
         "content": "대한민국상이군경회",
         "styles": {
           "fontSize": 14,
@@ -60,10 +60,10 @@
       {
         "id": "c1-cat",
         "type": "text",
-        "x": 443,
-        "y": 43,
-        "width": 100,
-        "height": 14,
+        "x": 591,
+        "y": 57,
+        "width": 133,
+        "height": 19,
         "content": "PATENT CATALOG",
         "styles": {
           "fontSize": 12,
@@ -74,10 +74,10 @@
       {
         "id": "c1-year",
         "type": "text",
-        "x": 443,
-        "y": 58,
-        "width": 100,
-        "height": 14,
+        "x": 591,
+        "y": 77,
+        "width": 133,
+        "height": 19,
         "content": "2024",
         "styles": {
           "fontSize": 12,
@@ -88,10 +88,10 @@
       {
         "id": "c1-title1",
         "type": "text",
-        "x": 51,
-        "y": 285,
-        "width": 493,
-        "height": 38,
+        "x": 68,
+        "y": 380,
+        "width": 658,
+        "height": 51,
         "content": "교량 3차원 거동 측정",
         "styles": {
           "fontSize": 30,
@@ -103,10 +103,10 @@
       {
         "id": "c1-title2",
         "type": "text",
-        "x": 51,
-        "y": 333,
-        "width": 493,
-        "height": 32,
+        "x": 68,
+        "y": 444,
+        "width": 658,
+        "height": 43,
         "content": "기술 특허 카탈로그",
         "styles": {
           "fontSize": 24,
@@ -118,9 +118,9 @@
       {
         "id": "c1-line",
         "type": "shape",
-        "x": 289,
-        "y": 383,
-        "width": 16,
+        "x": 386,
+        "y": 511,
+        "width": 21,
         "height": 1,
         "content": "",
         "styles": {
@@ -130,10 +130,10 @@
       {
         "id": "c1-desc",
         "type": "text",
-        "x": 80,
-        "y": 408,
-        "width": 435,
-        "height": 44,
+        "x": 107,
+        "y": 544,
+        "width": 580,
+        "height": 59,
         "content": "초음파 센서 기반 비접촉식 변위 측정 시스템을 활용한\n교량 구조물의 실시간 3차원 거동 모니터링 기술",
         "styles": {
           "fontSize": 14,
@@ -145,10 +145,10 @@
       {
         "id": "c1-pat1-img",
         "type": "image",
-        "x": 51,
-        "y": 485,
-        "width": 155,
-        "height": 200,
+        "x": 68,
+        "y": 647,
+        "width": 207,
+        "height": 267,
         "content": "/assets/1.jpg",
         "styles": {
           "borderRadius": 4,
@@ -159,10 +159,10 @@
       {
         "id": "c1-pat1-num",
         "type": "text",
-        "x": 51,
-        "y": 695,
-        "width": 155,
-        "height": 20,
+        "x": 68,
+        "y": 927,
+        "width": 207,
+        "height": 27,
         "content": "특허 제10-2654625호",
         "styles": {
           "fontSize": 14,
@@ -174,10 +174,10 @@
       {
         "id": "c1-pat1-title",
         "type": "text",
-        "x": 51,
-        "y": 712,
-        "width": 155,
-        "height": 22,
+        "x": 68,
+        "y": 950,
+        "width": 207,
+        "height": 29,
         "content": "측정 장치 및 시스템",
         "styles": {
           "fontSize": 14,
@@ -188,10 +188,10 @@
       {
         "id": "c1-pat2-img",
         "type": "image",
-        "x": 220,
-        "y": 485,
-        "width": 155,
-        "height": 200,
+        "x": 294,
+        "y": 647,
+        "width": 207,
+        "height": 267,
         "content": "/assets/2.jpg",
         "styles": {
           "borderRadius": 4,
@@ -202,10 +202,10 @@
       {
         "id": "c1-pat2-num",
         "type": "text",
-        "x": 220,
-        "y": 695,
-        "width": 155,
-        "height": 20,
+        "x": 294,
+        "y": 927,
+        "width": 207,
+        "height": 27,
         "content": "특허 제10-2654629호",
         "styles": {
           "fontSize": 14,
@@ -217,10 +217,10 @@
       {
         "id": "c1-pat2-title",
         "type": "text",
-        "x": 220,
-        "y": 712,
-        "width": 155,
-        "height": 22,
+        "x": 294,
+        "y": 950,
+        "width": 207,
+        "height": 29,
         "content": "측정 방법",
         "styles": {
           "fontSize": 14,
@@ -231,10 +231,10 @@
       {
         "id": "c1-pat3-img",
         "type": "image",
-        "x": 389,
-        "y": 485,
-        "width": 155,
-        "height": 200,
+        "x": 519,
+        "y": 647,
+        "width": 207,
+        "height": 267,
         "content": "/assets/3.jpg",
         "styles": {
           "borderRadius": 4,
@@ -245,10 +245,10 @@
       {
         "id": "c1-pat3-num",
         "type": "text",
-        "x": 389,
-        "y": 695,
-        "width": 155,
-        "height": 20,
+        "x": 519,
+        "y": 927,
+        "width": 207,
+        "height": 27,
         "content": "특허 제10-2654632호",
         "styles": {
           "fontSize": 14,
@@ -260,10 +260,10 @@
       {
         "id": "c1-pat3-title",
         "type": "text",
-        "x": 389,
-        "y": 712,
-        "width": 155,
-        "height": 22,
+        "x": 519,
+        "y": 950,
+        "width": 207,
+        "height": 29,
         "content": "측정 시스템",
         "styles": {
           "fontSize": 14,
@@ -274,9 +274,9 @@
       {
         "id": "c1-footer-line",
         "type": "shape",
-        "x": 51,
-        "y": 758,
-        "width": 493,
+        "x": 68,
+        "y": 1011,
+        "width": 658,
         "height": 1,
         "content": "",
         "styles": {
@@ -286,10 +286,10 @@
       {
         "id": "c1-pub1",
         "type": "text",
-        "x": 51,
-        "y": 770,
-        "width": 250,
-        "height": 16,
+        "x": 68,
+        "y": 1027,
+        "width": 334,
+        "height": 21,
         "content": "발행처",
         "styles": {
           "fontSize": 12,
@@ -300,10 +300,10 @@
       {
         "id": "c1-pub2",
         "type": "text",
-        "x": 51,
-        "y": 786,
-        "width": 250,
-        "height": 14,
+        "x": 68,
+        "y": 1048,
+        "width": 334,
+        "height": 19,
         "content": "대한민국상이군경회시설사업소",
         "styles": {
           "fontSize": 12,
@@ -313,10 +313,10 @@
       {
         "id": "c1-pub3",
         "type": "text",
-        "x": 51,
-        "y": 800,
-        "width": 250,
-        "height": 14,
+        "x": 68,
+        "y": 1067,
+        "width": 334,
+        "height": 19,
         "content": "안전진단팀",
         "styles": {
           "fontSize": 12,
@@ -326,10 +326,10 @@
       {
         "id": "c1-qr",
         "type": "image",
-        "x": 480,
-        "y": 766,
-        "width": 64,
-        "height": 64,
+        "x": 641,
+        "y": 1022,
+        "width": 85,
+        "height": 85,
         "content": "/assets/qr-code.png",
         "styles": {
           "objectFit": "contain"
@@ -341,14 +341,18 @@
     "id": "catalog-patent-cert",
     "title": "Patent Certificates",
     "backgroundColor": "#ffffff",
+    "contentArea": {
+      "margin": 32,
+      "backgroundColor": "#f3f4f6"
+    },
     "elements": [
       {
         "id": "c2-header",
         "type": "shape",
         "x": 0,
         "y": 0,
-        "width": 595,
-        "height": 98,
+        "width": 730,
+        "height": 131,
         "content": "",
         "styles": {
           "backgroundColor": "#1a1a2e"
@@ -357,10 +361,10 @@
       {
         "id": "c2-title",
         "type": "text",
-        "x": 32,
-        "y": 32,
-        "width": 400,
-        "height": 30,
+        "x": 11,
+        "y": 11,
+        "width": 534,
+        "height": 40,
         "content": "특허 등록 현황",
         "styles": {
           "fontSize": 24,
@@ -371,10 +375,10 @@
       {
         "id": "c2-subtitle",
         "type": "text",
-        "x": 32,
-        "y": 64,
-        "width": 300,
-        "height": 16,
+        "x": 11,
+        "y": 53,
+        "width": 400,
+        "height": 21,
         "content": "REGISTERED PATENTS",
         "styles": {
           "fontSize": 12,
@@ -385,10 +389,10 @@
       {
         "id": "c2-regdate",
         "type": "text",
-        "x": 480,
-        "y": 35,
-        "width": 83,
-        "height": 28,
+        "x": 609,
+        "y": 15,
+        "width": 111,
+        "height": 37,
         "content": "등록일 2024.04.01",
         "styles": {
           "fontSize": 12,
@@ -398,10 +402,10 @@
       {
         "id": "c2-intro",
         "type": "text",
-        "x": 32,
-        "y": 130,
-        "width": 531,
-        "height": 72,
+        "x": 11,
+        "y": 141,
+        "width": 709,
+        "height": 96,
         "content": "대한민국상이군경회 안전진단팀에서는 교량 구조물의 안전 관리를 위한 혁신적인 3차원 거동 측정 기술을 개발하여 3건의 특허를 등록하였습니다. 본 기술은 기존의 아날로그 방식 측정의 한계를 극복하고, 인력 투입 없이 실시간으로 정밀한 데이터를 수집할 수 있는 시스템입니다.",
         "styles": {
           "fontSize": 14,
@@ -412,10 +416,10 @@
       {
         "id": "c2-pat1-box",
         "type": "shape",
-        "x": 32,
-        "y": 220,
-        "width": 531,
-        "height": 110,
+        "x": 11,
+        "y": 261,
+        "width": 709,
+        "height": 147,
         "content": "",
         "styles": {
           "backgroundColor": "#ffffff",
@@ -426,10 +430,10 @@
       {
         "id": "c2-pat1-header",
         "type": "shape",
-        "x": 32,
-        "y": 220,
-        "width": 531,
-        "height": 42,
+        "x": 11,
+        "y": 261,
+        "width": 709,
+        "height": 56,
         "content": "",
         "styles": {
           "backgroundColor": "#f9fafb",
@@ -441,10 +445,10 @@
       {
         "id": "c2-pat1-badge",
         "type": "shape",
-        "x": 36,
-        "y": 228,
-        "width": 48,
-        "height": 26,
+        "x": 16,
+        "y": 272,
+        "width": 64,
+        "height": 35,
         "content": "",
         "styles": {
           "backgroundColor": "#1a1a2e",
@@ -454,10 +458,10 @@
       {
         "id": "c2-pat1-badge-txt",
         "type": "text",
-        "x": 36,
-        "y": 230,
-        "width": 48,
-        "height": 22,
+        "x": 16,
+        "y": 275,
+        "width": 64,
+        "height": 29,
         "content": "특허 1",
         "styles": {
           "fontSize": 14,
@@ -469,10 +473,10 @@
       {
         "id": "c2-pat1-num",
         "type": "text",
-        "x": 92,
-        "y": 226,
-        "width": 200,
-        "height": 28,
+        "x": 91,
+        "y": 269,
+        "width": 267,
+        "height": 37,
         "content": "제10-2654625호",
         "styles": {
           "fontSize": 20,
@@ -483,10 +487,10 @@
       {
         "id": "c2-pat1-reg",
         "type": "text",
-        "x": 420,
-        "y": 232,
-        "width": 135,
-        "height": 18,
+        "x": 528,
+        "y": 277,
+        "width": 180,
+        "height": 24,
         "content": "등록일: 2024년 04월 01일",
         "styles": {
           "fontSize": 14,
@@ -496,10 +500,10 @@
       {
         "id": "c2-pat1-title",
         "type": "text",
-        "x": 36,
-        "y": 268,
-        "width": 519,
-        "height": 24,
+        "x": 16,
+        "y": 325,
+        "width": 693,
+        "height": 32,
         "content": "교량의 3차원 거동 측정 장치 및 이를 포함하는 시스템",
         "styles": {
           "fontSize": 16,
@@ -510,10 +514,10 @@
       {
         "id": "c2-pat1-desc",
         "type": "text",
-        "x": 36,
-        "y": 292,
-        "width": 519,
-        "height": 34,
+        "x": 16,
+        "y": 357,
+        "width": 693,
+        "height": 45,
         "content": "초음파 센서를 활용하여 교량 상부구조물의 교축, 교직, 상하 방향 변위를 동시에 측정할 수 있는 장치 및 이를 통합한 모니터링 시스템",
         "styles": {
           "fontSize": 14,
@@ -524,10 +528,10 @@
       {
         "id": "c2-pat1-meta",
         "type": "text",
-        "x": 36,
-        "y": 324,
-        "width": 519,
-        "height": 16,
+        "x": 16,
+        "y": 400,
+        "width": 693,
+        "height": 21,
         "content": "출원번호: 제10-2023-0185643호   출원일: 2023년 12월 19일",
         "styles": {
           "fontSize": 12,
@@ -537,10 +541,10 @@
       {
         "id": "c2-pat2-box",
         "type": "shape",
-        "x": 32,
-        "y": 342,
-        "width": 531,
-        "height": 110,
+        "x": 11,
+        "y": 424,
+        "width": 709,
+        "height": 147,
         "content": "",
         "styles": {
           "backgroundColor": "#ffffff",
@@ -551,10 +555,10 @@
       {
         "id": "c2-pat2-header",
         "type": "shape",
-        "x": 32,
-        "y": 342,
-        "width": 531,
-        "height": 42,
+        "x": 11,
+        "y": 424,
+        "width": 709,
+        "height": 56,
         "content": "",
         "styles": {
           "backgroundColor": "#f9fafb",
@@ -564,10 +568,10 @@
       {
         "id": "c2-pat2-badge",
         "type": "shape",
-        "x": 36,
-        "y": 350,
-        "width": 48,
-        "height": 26,
+        "x": 16,
+        "y": 435,
+        "width": 64,
+        "height": 35,
         "content": "",
         "styles": {
           "backgroundColor": "#1a1a2e",
@@ -577,10 +581,10 @@
       {
         "id": "c2-pat2-badge-txt",
         "type": "text",
-        "x": 36,
-        "y": 352,
-        "width": 48,
-        "height": 22,
+        "x": 16,
+        "y": 437,
+        "width": 64,
+        "height": 29,
         "content": "특허 2",
         "styles": {
           "fontSize": 14,
@@ -592,10 +596,10 @@
       {
         "id": "c2-pat2-num",
         "type": "text",
-        "x": 92,
-        "y": 348,
-        "width": 200,
-        "height": 28,
+        "x": 91,
+        "y": 432,
+        "width": 267,
+        "height": 37,
         "content": "제10-2654629호",
         "styles": {
           "fontSize": 20,
@@ -606,10 +610,10 @@
       {
         "id": "c2-pat2-reg",
         "type": "text",
-        "x": 420,
-        "y": 354,
-        "width": 135,
-        "height": 18,
+        "x": 528,
+        "y": 440,
+        "width": 180,
+        "height": 24,
         "content": "등록일: 2024년 04월 01일",
         "styles": {
           "fontSize": 14,
@@ -619,10 +623,10 @@
       {
         "id": "c2-pat2-title",
         "type": "text",
-        "x": 36,
-        "y": 390,
-        "width": 519,
-        "height": 24,
+        "x": 16,
+        "y": 488,
+        "width": 693,
+        "height": 32,
         "content": "교량의 3차원 거동 측정 방법",
         "styles": {
           "fontSize": 16,
@@ -633,10 +637,10 @@
       {
         "id": "c2-pat2-desc",
         "type": "text",
-        "x": 36,
-        "y": 414,
-        "width": 519,
-        "height": 34,
+        "x": 16,
+        "y": 520,
+        "width": 693,
+        "height": 45,
         "content": "측정 기준판을 기준으로 3개의 초음파 센서를 배치하여 교량의 3차원 거동을 측정하는 방법",
         "styles": {
           "fontSize": 14,
@@ -647,10 +651,10 @@
       {
         "id": "c2-pat2-meta",
         "type": "text",
-        "x": 36,
-        "y": 446,
-        "width": 519,
-        "height": 16,
+        "x": 16,
+        "y": 563,
+        "width": 693,
+        "height": 21,
         "content": "출원번호: 제10-2023-0185661호   출원일: 2023년 12월 19일",
         "styles": {
           "fontSize": 12,
@@ -660,10 +664,10 @@
       {
         "id": "c2-pat3-box",
         "type": "shape",
-        "x": 32,
-        "y": 464,
-        "width": 531,
-        "height": 110,
+        "x": 11,
+        "y": 587,
+        "width": 709,
+        "height": 147,
         "content": "",
         "styles": {
           "backgroundColor": "#ffffff",
@@ -674,10 +678,10 @@
       {
         "id": "c2-pat3-header",
         "type": "shape",
-        "x": 32,
-        "y": 464,
-        "width": 531,
-        "height": 42,
+        "x": 11,
+        "y": 587,
+        "width": 709,
+        "height": 56,
         "content": "",
         "styles": {
           "backgroundColor": "#f9fafb",
@@ -687,10 +691,10 @@
       {
         "id": "c2-pat3-badge",
         "type": "shape",
-        "x": 36,
-        "y": 472,
-        "width": 48,
-        "height": 26,
+        "x": 16,
+        "y": 598,
+        "width": 64,
+        "height": 35,
         "content": "",
         "styles": {
           "backgroundColor": "#1a1a2e",
@@ -700,10 +704,10 @@
       {
         "id": "c2-pat3-badge-txt",
         "type": "text",
-        "x": 36,
-        "y": 474,
-        "width": 48,
-        "height": 22,
+        "x": 16,
+        "y": 600,
+        "width": 64,
+        "height": 29,
         "content": "특허 3",
         "styles": {
           "fontSize": 14,
@@ -715,10 +719,10 @@
       {
         "id": "c2-pat3-num",
         "type": "text",
-        "x": 92,
-        "y": 470,
-        "width": 200,
-        "height": 28,
+        "x": 91,
+        "y": 595,
+        "width": 267,
+        "height": 37,
         "content": "제10-2654632호",
         "styles": {
           "fontSize": 20,
@@ -729,10 +733,10 @@
       {
         "id": "c2-pat3-reg",
         "type": "text",
-        "x": 420,
-        "y": 476,
-        "width": 135,
-        "height": 18,
+        "x": 528,
+        "y": 603,
+        "width": 180,
+        "height": 24,
         "content": "등록일: 2024년 04월 01일",
         "styles": {
           "fontSize": 14,
@@ -742,10 +746,10 @@
       {
         "id": "c2-pat3-title",
         "type": "text",
-        "x": 36,
-        "y": 512,
-        "width": 519,
-        "height": 24,
+        "x": 16,
+        "y": 651,
+        "width": 693,
+        "height": 32,
         "content": "교량의 3차원 거동 측정 시스템",
         "styles": {
           "fontSize": 16,
@@ -756,10 +760,10 @@
       {
         "id": "c2-pat3-desc",
         "type": "text",
-        "x": 36,
-        "y": 536,
-        "width": 519,
-        "height": 34,
+        "x": 16,
+        "y": 683,
+        "width": 693,
+        "height": 45,
         "content": "블루투스 통신과 클라우드 데이터 저장을 활용한 원격 모니터링 및 데이터 관리 통합 시스템",
         "styles": {
           "fontSize": 14,
@@ -770,10 +774,10 @@
       {
         "id": "c2-pat3-meta",
         "type": "text",
-        "x": 36,
-        "y": 568,
-        "width": 519,
-        "height": 16,
+        "x": 16,
+        "y": 726,
+        "width": 693,
+        "height": 21,
         "content": "출원번호: 제10-2023-0185678호   출원일: 2023년 12월 19일",
         "styles": {
           "fontSize": 12,
@@ -783,10 +787,10 @@
       {
         "id": "c2-sect-title",
         "type": "text",
-        "x": 32,
-        "y": 600,
-        "width": 531,
-        "height": 28,
+        "x": 11,
+        "y": 768,
+        "width": 709,
+        "height": 37,
         "content": "특허 활용실적 증명서",
         "styles": {
           "fontSize": 20,
@@ -797,10 +801,10 @@
       {
         "id": "c2-cert1",
         "type": "image",
-        "x": 32,
-        "y": 636,
-        "width": 168,
-        "height": 170,
+        "x": 11,
+        "y": 816,
+        "width": 224,
+        "height": 211,
         "content": "/assets/certification1.jpg",
         "styles": {
           "borderRadius": 4,
@@ -811,10 +815,10 @@
       {
         "id": "c2-cert1-cap",
         "type": "text",
-        "x": 32,
-        "y": 810,
-        "width": 168,
-        "height": 16,
+        "x": 11,
+        "y": 1032,
+        "width": 224,
+        "height": 21,
         "content": "특허 실용신안 활용실적 확인",
         "styles": {
           "fontSize": 12,
@@ -826,10 +830,10 @@
       {
         "id": "c2-cert2",
         "type": "image",
-        "x": 213,
-        "y": 636,
-        "width": 168,
-        "height": 170,
+        "x": 252,
+        "y": 816,
+        "width": 224,
+        "height": 211,
         "content": "/assets/certification2.jpg",
         "styles": {
           "borderRadius": 4,
@@ -840,10 +844,10 @@
       {
         "id": "c2-cert2-cap",
         "type": "text",
-        "x": 213,
-        "y": 810,
-        "width": 168,
-        "height": 16,
+        "x": 252,
+        "y": 1032,
+        "width": 224,
+        "height": 21,
         "content": "활용기술 목록",
         "styles": {
           "fontSize": 12,
@@ -855,10 +859,10 @@
       {
         "id": "c2-cert3",
         "type": "image",
-        "x": 394,
-        "y": 636,
-        "width": 168,
-        "height": 170,
+        "x": 494,
+        "y": 816,
+        "width": 224,
+        "height": 211,
         "content": "/assets/certification3.jpg",
         "styles": {
           "borderRadius": 4,
@@ -869,10 +873,10 @@
       {
         "id": "c2-cert3-cap",
         "type": "text",
-        "x": 394,
-        "y": 810,
-        "width": 168,
-        "height": 16,
+        "x": 494,
+        "y": 1032,
+        "width": 224,
+        "height": 21,
         "content": "활용실적 내역표",
         "styles": {
           "fontSize": 12,
@@ -884,10 +888,10 @@
       {
         "id": "c2-pagenum",
         "type": "text",
-        "x": 520,
-        "y": 818,
-        "width": 40,
-        "height": 16,
+        "x": 662,
+        "y": 1038,
+        "width": 53,
+        "height": 21,
         "content": "01",
         "styles": {
           "fontSize": 12,
@@ -900,14 +904,18 @@
     "id": "catalog-overview",
     "title": "Patent Overview",
     "backgroundColor": "#ffffff",
+    "contentArea": {
+      "margin": 32,
+      "backgroundColor": "#f3f4f6"
+    },
     "elements": [
       {
         "id": "c3-header",
         "type": "shape",
         "x": 0,
         "y": 0,
-        "width": 595,
-        "height": 98,
+        "width": 730,
+        "height": 131,
         "content": "",
         "styles": {
           "backgroundColor": "#1a1a2e"
@@ -916,10 +924,10 @@
       {
         "id": "c3-title",
         "type": "text",
-        "x": 32,
-        "y": 32,
-        "width": 400,
-        "height": 30,
+        "x": 11,
+        "y": 11,
+        "width": 534,
+        "height": 40,
         "content": "교량의 3차원 거동 측정 장치",
         "styles": {
           "fontSize": 24,
@@ -930,10 +938,10 @@
       {
         "id": "c3-subtitle",
         "type": "text",
-        "x": 32,
-        "y": 64,
-        "width": 450,
-        "height": 16,
+        "x": 11,
+        "y": 53,
+        "width": 601,
+        "height": 21,
         "content": "BRIDGE Thermal movement Measurement Device with System",
         "styles": {
           "fontSize": 12,
@@ -944,10 +952,10 @@
       {
         "id": "c3-inventor-lbl",
         "type": "text",
-        "x": 32,
-        "y": 130,
-        "width": 128,
-        "height": 14,
+        "x": 11,
+        "y": 141,
+        "width": 171,
+        "height": 19,
         "content": "INVENTOR",
         "styles": {
           "fontSize": 12,
@@ -958,10 +966,10 @@
       {
         "id": "c3-inventor",
         "type": "text",
-        "x": 32,
-        "y": 146,
-        "width": 128,
-        "height": 18,
+        "x": 11,
+        "y": 163,
+        "width": 171,
+        "height": 24,
         "content": "나상우",
         "styles": {
           "fontSize": 14,
@@ -972,10 +980,10 @@
       {
         "id": "c3-assignee-lbl",
         "type": "text",
-        "x": 32,
-        "y": 178,
-        "width": 128,
-        "height": 14,
+        "x": 11,
+        "y": 205,
+        "width": 171,
+        "height": 19,
         "content": "ASSIGNEE",
         "styles": {
           "fontSize": 12,
@@ -986,10 +994,10 @@
       {
         "id": "c3-assignee",
         "type": "text",
-        "x": 32,
-        "y": 194,
-        "width": 128,
-        "height": 36,
+        "x": 11,
+        "y": 227,
+        "width": 171,
+        "height": 48,
         "content": "대한민국상이군경회",
         "styles": {
           "fontSize": 14,
@@ -1001,10 +1009,10 @@
       {
         "id": "c3-ref-lbl",
         "type": "text",
-        "x": 32,
-        "y": 244,
-        "width": 128,
-        "height": 14,
+        "x": 11,
+        "y": 293,
+        "width": 171,
+        "height": 19,
         "content": "REF CODE",
         "styles": {
           "fontSize": 12,
@@ -1015,10 +1023,10 @@
       {
         "id": "c3-ref",
         "type": "text",
-        "x": 32,
-        "y": 260,
-        "width": 128,
-        "height": 18,
+        "x": 11,
+        "y": 315,
+        "width": 171,
+        "height": 24,
         "content": "KR10-2654625-B1",
         "styles": {
           "fontSize": 14,
@@ -1029,10 +1037,10 @@
       {
         "id": "c3-abstract-lbl",
         "type": "text",
-        "x": 176,
-        "y": 122,
-        "width": 100,
-        "height": 14,
+        "x": 203,
+        "y": 131,
+        "width": 133,
+        "height": 19,
         "content": "ABSTRACT",
         "styles": {
           "fontSize": 12,
@@ -1044,10 +1052,10 @@
       {
         "id": "c3-abstract",
         "type": "text",
-        "x": 176,
-        "y": 140,
-        "width": 387,
-        "height": 100,
+        "x": 203,
+        "y": 155,
+        "width": 516,
+        "height": 133,
         "content": "아두이노와 초음파 센서 모듈을 사용하여 교량의 교축, 교직, 상하 방향의 3차원 거동을 측정하는 시스템 및 방법. 본 시스템은 교량 상부구조물(거더)에 측정 장치를 설치하고, 하부구조물(교대, 교각)에 측정 기준판을 부착하여 초음파 센서를 통해 상부 구조물의 이동에 따른 변위를 정밀 측정한다. 블루투스 모듈을 통한 무선 데이터 송신과 SD카드 저장을 통해 장기간 모니터링이 가능하며, 모바일 어플리케이션을 통해 실시간으로 데이터를 클라우드 서버로 전송할 수 있다.",
         "styles": {
           "fontSize": 14,
@@ -1059,10 +1067,10 @@
       {
         "id": "c3-fig-box",
         "type": "shape",
-        "x": 32,
-        "y": 256,
-        "width": 531,
-        "height": 290,
+        "x": 11,
+        "y": 309,
+        "width": 709,
+        "height": 368,
         "content": "",
         "styles": {
           "backgroundColor": "#ffffff",
@@ -1073,10 +1081,10 @@
       {
         "id": "c3-fig",
         "type": "image",
-        "x": 44,
-        "y": 268,
-        "width": 507,
-        "height": 258,
+        "x": 27,
+        "y": 325,
+        "width": 677,
+        "height": 325,
         "content": "/assets/Overview.png",
         "styles": {
           "objectFit": "contain"
@@ -1085,10 +1093,10 @@
       {
         "id": "c3-fig-cap",
         "type": "text",
-        "x": 32,
-        "y": 532,
-        "width": 531,
-        "height": 14,
+        "x": 11,
+        "y": 672,
+        "width": 709,
+        "height": 19,
         "content": "FIG. 1 - 시스템 구성도",
         "styles": {
           "fontSize": 12,
@@ -1099,10 +1107,10 @@
       {
         "id": "c3-desc-lbl",
         "type": "text",
-        "x": 32,
-        "y": 562,
-        "width": 250,
-        "height": 24,
+        "x": 11,
+        "y": 712,
+        "width": 334,
+        "height": 32,
         "content": "DESCRIPTION",
         "styles": {
           "fontSize": 20,
@@ -1113,10 +1121,10 @@
       {
         "id": "c3-desc",
         "type": "text",
-        "x": 32,
-        "y": 586,
-        "width": 250,
-        "height": 180,
+        "x": 11,
+        "y": 744,
+        "width": 334,
+        "height": 219,
         "content": "본 발명은 교량 구조물의 3차원 거동량을 정밀하게 측정하기 위한 시스템에 관한 것이다. 교량 구조물은 형식 및 온도 변화에 따라 지속적으로 신축과 수축을 반복하며, 이에 대응하기 위해 상부에는 신축이음이, 하부에는 교량받침이 설치된다.\n\n기존의 육안 검사 및 아날로그 방식의 측정 기법과 비교하여, 본 연구에서 개발한 초음파 센서 기반의 변위 측정 시스템은 자동화된 데이터 수집과 고정밀 측정을 가능하게 한다. 온습도 데이터를 동시에 저장하여 환경 변화에 따른 교량의 거동을 정밀하게 분석할 수 있도록 설계되었다.\n\n아두이노 기반 시스템을 활용함으로써 제작 비용을 절감하면서도 실시간 데이터 수집 및 저장이 가능하며, 블루투스 모듈을 통한 무선 데이터 송신 기능으로 유지보수 인력의 접근성을 높였다.",
         "styles": {
           "fontSize": 13,
@@ -1128,10 +1136,10 @@
       {
         "id": "c3-claims-lbl",
         "type": "text",
-        "x": 302,
-        "y": 562,
-        "width": 250,
-        "height": 24,
+        "x": 371,
+        "y": 712,
+        "width": 334,
+        "height": 32,
         "content": "CLAIMS",
         "styles": {
           "fontSize": 20,
@@ -1142,10 +1150,10 @@
       {
         "id": "c3-claims",
         "type": "text",
-        "x": 302,
-        "y": 586,
-        "width": 261,
-        "height": 180,
+        "x": 371,
+        "y": 744,
+        "width": 348,
+        "height": 219,
         "content": "1. 교량 상부구조물에 설치되며, 3개의 초음파 센서를 포함하여 교축, 교직, 상하 방향의 변위를 동시에 측정하는 3차원 거동 측정 장치.\n\n2. 제1항의 장치에 있어서, 온습도 센서를 포함하여 측정 시점의 환경 데이터를 함께 기록하는 것을 특징으로 하는 측정 장치.\n\n3. 블루투스 모듈을 통해 측정 데이터를 무선으로 전송하고, 모바일 어플리케이션을 통해 클라우드 서버로 데이터를 전송하는 방법.\n\n4. SD카드 모듈을 통해 장기간의 측정 데이터를 로컬에 저장하고, 사용자 요청 시 특정 기간의 데이터를 필터링하여 전송하는 시스템.",
         "styles": {
           "fontSize": 13,
@@ -1156,10 +1164,10 @@
       {
         "id": "c3-pagenum",
         "type": "text",
-        "x": 520,
-        "y": 818,
-        "width": 40,
-        "height": 16,
+        "x": 662,
+        "y": 1038,
+        "width": 53,
+        "height": 21,
         "content": "02",
         "styles": {
           "fontSize": 12,
@@ -1172,14 +1180,18 @@
     "id": "catalog-tech-1",
     "title": "Technical Details 1",
     "backgroundColor": "#f9fafb",
+    "contentArea": {
+      "margin": 32,
+      "backgroundColor": "#f3f4f6"
+    },
     "elements": [
       {
         "id": "c4-header",
         "type": "shape",
         "x": 0,
         "y": 0,
-        "width": 595,
-        "height": 98,
+        "width": 730,
+        "height": 131,
         "content": "",
         "styles": {
           "backgroundColor": "#1a1a2e"
@@ -1188,10 +1200,10 @@
       {
         "id": "c4-title",
         "type": "text",
-        "x": 32,
-        "y": 32,
-        "width": 400,
-        "height": 30,
+        "x": 11,
+        "y": 11,
+        "width": 534,
+        "height": 40,
         "content": "기술 세부 사양 (1/2)",
         "styles": {
           "fontSize": 24,
@@ -1202,10 +1214,10 @@
       {
         "id": "c4-subtitle",
         "type": "text",
-        "x": 32,
-        "y": 64,
-        "width": 450,
-        "height": 16,
+        "x": 11,
+        "y": 53,
+        "width": 601,
+        "height": 21,
         "content": "TECHNICAL SPECIFICATIONS - SYSTEM OVERVIEW",
         "styles": {
           "fontSize": 12,
@@ -1216,10 +1228,10 @@
       {
         "id": "c4-overview-lbl",
         "type": "text",
-        "x": 32,
-        "y": 122,
-        "width": 531,
-        "height": 24,
+        "x": 11,
+        "y": 131,
+        "width": 709,
+        "height": 32,
         "content": "시스템 개요",
         "styles": {
           "fontSize": 20,
@@ -1230,10 +1242,10 @@
       {
         "id": "c4-overview",
         "type": "text",
-        "x": 32,
-        "y": 150,
-        "width": 531,
-        "height": 44,
+        "x": 11,
+        "y": 168,
+        "width": 709,
+        "height": 59,
         "content": "본 측정 시스템은 Arduino UNO를 메인 컨트롤러로 사용하며, 5개의 핵심 모듈로 구성됩니다. 각 모듈은 Digital Pin(D2~D13)과 Analog Pin(A0~A5)에 연결되어 통합 운영됩니다.",
         "styles": {
           "fontSize": 14,
@@ -1244,10 +1256,10 @@
       {
         "id": "c4-comp-box",
         "type": "shape",
-        "x": 32,
-        "y": 210,
-        "width": 531,
-        "height": 590,
+        "x": 11,
+        "y": 248,
+        "width": 709,
+        "height": 755,
         "content": "",
         "styles": {
           "backgroundColor": "#ffffff",
@@ -1258,10 +1270,10 @@
       {
         "id": "c4-hcsr-img",
         "type": "image",
-        "x": 36,
-        "y": 216,
-        "width": 200,
-        "height": 100,
+        "x": 16,
+        "y": 256,
+        "width": 267,
+        "height": 133,
         "content": "/assets/HC-SR04.png",
         "styles": {
           "objectFit": "contain"
@@ -1270,10 +1282,10 @@
       {
         "id": "c4-hcsr-name",
         "type": "text",
-        "x": 248,
-        "y": 220,
-        "width": 200,
-        "height": 22,
+        "x": 299,
+        "y": 261,
+        "width": 267,
+        "height": 29,
         "content": "HC-SR04",
         "styles": {
           "fontSize": 18,
@@ -1284,10 +1296,10 @@
       {
         "id": "c4-hcsr-kr",
         "type": "text",
-        "x": 330,
-        "y": 222,
-        "width": 120,
-        "height": 18,
+        "x": 408,
+        "y": 264,
+        "width": 160,
+        "height": 24,
         "content": "(초음파 거리 센서)",
         "styles": {
           "fontSize": 14,
@@ -1297,10 +1309,10 @@
       {
         "id": "c4-hcsr-desc",
         "type": "text",
-        "x": 248,
-        "y": 246,
-        "width": 307,
-        "height": 40,
+        "x": 299,
+        "y": 296,
+        "width": 410,
+        "height": 53,
         "content": "초음파로 거리 측정. 343m/s 전파속도 활용.\nPIN: VCC, Trig(A0/A2/A4), Echo(A1/A3/A5), GND",
         "styles": {
           "fontSize": 14,
@@ -1311,9 +1323,9 @@
       {
         "id": "c4-div1",
         "type": "shape",
-        "x": 36,
-        "y": 328,
-        "width": 519,
+        "x": 16,
+        "y": 405,
+        "width": 693,
         "height": 1,
         "content": "",
         "styles": {
@@ -1323,10 +1335,10 @@
       {
         "id": "c4-dht-img",
         "type": "image",
-        "x": 36,
-        "y": 340,
-        "width": 200,
-        "height": 100,
+        "x": 16,
+        "y": 421,
+        "width": 267,
+        "height": 133,
         "content": "/assets/DHT-11.png",
         "styles": {
           "objectFit": "contain"
@@ -1335,10 +1347,10 @@
       {
         "id": "c4-dht-name",
         "type": "text",
-        "x": 248,
-        "y": 344,
-        "width": 200,
-        "height": 22,
+        "x": 299,
+        "y": 427,
+        "width": 267,
+        "height": 29,
         "content": "DHT-11",
         "styles": {
           "fontSize": 18,
@@ -1349,10 +1361,10 @@
       {
         "id": "c4-dht-kr",
         "type": "text",
-        "x": 305,
-        "y": 346,
-        "width": 100,
-        "height": 18,
+        "x": 375,
+        "y": 429,
+        "width": 133,
+        "height": 24,
         "content": "(온습도 센서)",
         "styles": {
           "fontSize": 14,
@@ -1362,10 +1374,10 @@
       {
         "id": "c4-dht-desc",
         "type": "text",
-        "x": 248,
-        "y": 370,
-        "width": 307,
-        "height": 40,
+        "x": 299,
+        "y": 461,
+        "width": 410,
+        "height": 53,
         "content": "온도/습도 기록. 환경-변위 상관관계 분석용.\nPIN: GND, NC, D2, VCC",
         "styles": {
           "fontSize": 14,
@@ -1376,9 +1388,9 @@
       {
         "id": "c4-div2",
         "type": "shape",
-        "x": 36,
-        "y": 452,
-        "width": 519,
+        "x": 16,
+        "y": 571,
+        "width": 693,
         "height": 1,
         "content": "",
         "styles": {
@@ -1388,10 +1400,10 @@
       {
         "id": "c4-hc06-img",
         "type": "image",
-        "x": 36,
-        "y": 464,
-        "width": 200,
-        "height": 100,
+        "x": 16,
+        "y": 587,
+        "width": 267,
+        "height": 133,
         "content": "/assets/HC-06.png",
         "styles": {
           "objectFit": "contain"
@@ -1400,10 +1412,10 @@
       {
         "id": "c4-hc06-name",
         "type": "text",
-        "x": 248,
-        "y": 468,
-        "width": 200,
-        "height": 22,
+        "x": 299,
+        "y": 592,
+        "width": 267,
+        "height": 29,
         "content": "HC-06",
         "styles": {
           "fontSize": 18,
@@ -1414,10 +1426,10 @@
       {
         "id": "c4-hc06-kr",
         "type": "text",
-        "x": 305,
-        "y": 470,
-        "width": 100,
-        "height": 18,
+        "x": 375,
+        "y": 595,
+        "width": 133,
+        "height": 24,
         "content": "(블루투스 모듈)",
         "styles": {
           "fontSize": 14,
@@ -1427,10 +1439,10 @@
       {
         "id": "c4-hc06-desc",
         "type": "text",
-        "x": 248,
-        "y": 494,
-        "width": 307,
-        "height": 40,
+        "x": 299,
+        "y": 627,
+        "width": 410,
+        "height": 53,
         "content": "무선 데이터 통신. 모바일 앱 연동 실시간 전송.\nPIN: VCC, GND, TX(D7), RX(D8)",
         "styles": {
           "fontSize": 14,
@@ -1441,9 +1453,9 @@
       {
         "id": "c4-div3",
         "type": "shape",
-        "x": 36,
-        "y": 576,
-        "width": 519,
+        "x": 16,
+        "y": 736,
+        "width": 693,
         "height": 1,
         "content": "",
         "styles": {
@@ -1453,10 +1465,10 @@
       {
         "id": "c4-ds-img",
         "type": "image",
-        "x": 36,
-        "y": 588,
-        "width": 200,
-        "height": 100,
+        "x": 16,
+        "y": 752,
+        "width": 267,
+        "height": 133,
         "content": "/assets/DS-1302.png",
         "styles": {
           "objectFit": "contain"
@@ -1465,10 +1477,10 @@
       {
         "id": "c4-ds-name",
         "type": "text",
-        "x": 248,
-        "y": 592,
-        "width": 200,
-        "height": 22,
+        "x": 299,
+        "y": 758,
+        "width": 267,
+        "height": 29,
         "content": "DS-1302",
         "styles": {
           "fontSize": 18,
@@ -1479,10 +1491,10 @@
       {
         "id": "c4-ds-kr",
         "type": "text",
-        "x": 318,
-        "y": 594,
-        "width": 80,
-        "height": 18,
+        "x": 392,
+        "y": 760,
+        "width": 107,
+        "height": 24,
         "content": "(RTC 모듈)",
         "styles": {
           "fontSize": 14,
@@ -1492,10 +1504,10 @@
       {
         "id": "c4-ds-desc",
         "type": "text",
-        "x": 248,
-        "y": 618,
-        "width": 307,
-        "height": 40,
+        "x": 299,
+        "y": 792,
+        "width": 410,
+        "height": 53,
         "content": "실시간 시계. 타임스탬프 기록으로 시계열 분석.\nPIN: VCC, GND, CLK(D6), DAT(D5), RST(D3)",
         "styles": {
           "fontSize": 14,
@@ -1506,9 +1518,9 @@
       {
         "id": "c4-div4",
         "type": "shape",
-        "x": 36,
-        "y": 700,
-        "width": 519,
+        "x": 16,
+        "y": 902,
+        "width": 693,
         "height": 1,
         "content": "",
         "styles": {
@@ -1518,10 +1530,10 @@
       {
         "id": "c4-sd-img",
         "type": "image",
-        "x": 36,
-        "y": 712,
-        "width": 200,
-        "height": 100,
+        "x": 16,
+        "y": 918,
+        "width": 267,
+        "height": 133,
         "content": "/assets/SDcard.png",
         "styles": {
           "objectFit": "contain"
@@ -1530,10 +1542,10 @@
       {
         "id": "c4-sd-name",
         "type": "text",
-        "x": 248,
-        "y": 716,
-        "width": 200,
-        "height": 22,
+        "x": 299,
+        "y": 923,
+        "width": 267,
+        "height": 29,
         "content": "SD Card Module",
         "styles": {
           "fontSize": 18,
@@ -1544,10 +1556,10 @@
       {
         "id": "c4-sd-kr",
         "type": "text",
-        "x": 400,
-        "y": 718,
-        "width": 100,
-        "height": 18,
+        "x": 502,
+        "y": 926,
+        "width": 133,
+        "height": 24,
         "content": "(SD카드 소켓 모듈)",
         "styles": {
           "fontSize": 14,
@@ -1557,10 +1569,10 @@
       {
         "id": "c4-sd-desc",
         "type": "text",
-        "x": 248,
-        "y": 742,
-        "width": 307,
-        "height": 40,
+        "x": 299,
+        "y": 958,
+        "width": 410,
+        "height": 53,
         "content": "장기 데이터 로컬 저장. 월간 전송 약 2분 30초.\nPIN: CS(D4), SCK(D13), MOSI(D11), MISO(D12), VCC, GND",
         "styles": {
           "fontSize": 14,
@@ -1571,10 +1583,10 @@
       {
         "id": "c4-pagenum",
         "type": "text",
-        "x": 520,
-        "y": 818,
-        "width": 40,
-        "height": 16,
+        "x": 662,
+        "y": 1038,
+        "width": 53,
+        "height": 21,
         "content": "03",
         "styles": {
           "fontSize": 12,
@@ -1587,14 +1599,18 @@
     "id": "catalog-tech-2",
     "title": "Technical Details 2",
     "backgroundColor": "#f9fafb",
+    "contentArea": {
+      "margin": 32,
+      "backgroundColor": "#f3f4f6"
+    },
     "elements": [
       {
         "id": "c5-header",
         "type": "shape",
         "x": 0,
         "y": 0,
-        "width": 595,
-        "height": 98,
+        "width": 730,
+        "height": 131,
         "content": "",
         "styles": {
           "backgroundColor": "#1a1a2e"
@@ -1603,10 +1619,10 @@
       {
         "id": "c5-title",
         "type": "text",
-        "x": 32,
-        "y": 32,
-        "width": 400,
-        "height": 30,
+        "x": 11,
+        "y": 11,
+        "width": 534,
+        "height": 40,
         "content": "기술 세부 사양 (2/2)",
         "styles": {
           "fontSize": 24,
@@ -1617,10 +1633,10 @@
       {
         "id": "c5-subtitle",
         "type": "text",
-        "x": 32,
-        "y": 64,
-        "width": 450,
-        "height": 16,
+        "x": 11,
+        "y": 53,
+        "width": 601,
+        "height": 21,
         "content": "TECHNICAL SPECIFICATIONS - PIN CONFIGURATION DIAGRAM",
         "styles": {
           "fontSize": 12,
@@ -1631,10 +1647,10 @@
       {
         "id": "c5-diag-lbl",
         "type": "text",
-        "x": 32,
-        "y": 122,
-        "width": 531,
-        "height": 24,
+        "x": 11,
+        "y": 131,
+        "width": 709,
+        "height": 32,
         "content": "PIN CONFIGURATION DIAGRAM",
         "styles": {
           "fontSize": 20,
@@ -1645,10 +1661,10 @@
       {
         "id": "c5-diag-box",
         "type": "shape",
-        "x": 32,
-        "y": 152,
-        "width": 531,
-        "height": 280,
+        "x": 11,
+        "y": 171,
+        "width": 709,
+        "height": 373,
         "content": "",
         "styles": {
           "backgroundColor": "#ffffff",
@@ -1659,10 +1675,10 @@
       {
         "id": "c5-diag",
         "type": "image",
-        "x": 44,
-        "y": 164,
-        "width": 507,
-        "height": 248,
+        "x": 27,
+        "y": 187,
+        "width": 677,
+        "height": 331,
         "content": "/assets/Pin number matching.png",
         "styles": {
           "objectFit": "contain"
@@ -1671,10 +1687,10 @@
       {
         "id": "c5-diag-cap",
         "type": "text",
-        "x": 32,
-        "y": 420,
-        "width": 531,
-        "height": 32,
+        "x": 11,
+        "y": 528,
+        "width": 709,
+        "height": 43,
         "content": "D는 Digital 핀을, A는 Analog 핀을 의미합니다. VCC(전원)는 빨간색, GND(접지)는 검정색으로 표기됩니다.",
         "styles": {
           "fontSize": 12,
@@ -1685,10 +1701,10 @@
       {
         "id": "c5-desc1",
         "type": "text",
-        "x": 32,
-        "y": 468,
-        "width": 531,
-        "height": 52,
+        "x": 11,
+        "y": 592,
+        "width": 709,
+        "height": 69,
         "content": "본 측정 시스템은 Arduino UNO를 메인 컨트롤러로 사용하며, 5개의 핵심 모듈이 Digital Pin(D2~D13)과 Analog Pin(A0~A5)에 체계적으로 연결되어 통합 운영됩니다. 3개의 초음파 센서(HC-SR04)는 Analog Pin을 통해 교축, 교직, 상하 방향의 변위를 동시에 측정하며, 온습도 센서(DHT-11)는 Digital Pin D2에 연결되어 측정 시점의 환경 데이터를 함께 기록합니다.",
         "styles": {
           "fontSize": 14,
@@ -1700,10 +1716,10 @@
       {
         "id": "c5-desc2",
         "type": "text",
-        "x": 32,
-        "y": 526,
-        "width": 531,
-        "height": 52,
+        "x": 11,
+        "y": 670,
+        "width": 709,
+        "height": 69,
         "content": "블루투스 모듈(HC-06)은 Digital Pin D7(TX), D8(RX)에 연결되어 측정 데이터를 무선으로 전송하고, 모바일 어플리케이션을 통해 클라우드 서버로 데이터를 전송할 수 있습니다. SD카드 모듈은 Digital Pin D4(CS), D11(MOSI), D12(MISO), D13(SCK)에 연결되어 장기간의 측정 데이터를 로컬에 저장하며, 사용자 요청 시 특정 기간의 데이터를 필터링하여 전송하는 기능을 제공합니다.",
         "styles": {
           "fontSize": 14,
@@ -1715,10 +1731,10 @@
       {
         "id": "c5-desc3",
         "type": "text",
-        "x": 32,
-        "y": 584,
-        "width": 531,
-        "height": 52,
+        "x": 11,
+        "y": 747,
+        "width": 709,
+        "height": 69,
         "content": "RTC 모듈(DS-1302)은 Digital Pin D3(RST), D5(DAT), D6(CLK)에 연결되어 실시간 시계 기능을 제공하며, 타임스탬프 기록을 통해 시계열 데이터 분석을 가능하게 합니다. 이러한 모듈 간의 체계적인 핀 구성은 아두이노 기반 시스템의 제작 비용 절감과 함께 실시간 데이터 수집 및 저장을 가능하게 하며, 블루투스 모듈을 통한 무선 데이터 송신 기능으로 유지보수 인력의 접근성을 높였습니다.",
         "styles": {
           "fontSize": 14,
@@ -1730,10 +1746,10 @@
       {
         "id": "c5-spec-box",
         "type": "shape",
-        "x": 32,
-        "y": 656,
-        "width": 531,
-        "height": 100,
+        "x": 11,
+        "y": 843,
+        "width": 709,
+        "height": 133,
         "content": "",
         "styles": {
           "backgroundColor": "#f3f4f6",
@@ -1743,10 +1759,10 @@
       {
         "id": "c5-spec-lbl",
         "type": "text",
-        "x": 48,
-        "y": 668,
-        "width": 200,
-        "height": 20,
+        "x": 32,
+        "y": 859,
+        "width": 267,
+        "height": 27,
         "content": "데이터 저장 사양",
         "styles": {
           "fontSize": 14,
@@ -1757,10 +1773,10 @@
       {
         "id": "c5-spec1-lbl",
         "type": "text",
-        "x": 48,
-        "y": 696,
-        "width": 150,
-        "height": 14,
+        "x": 32,
+        "y": 896,
+        "width": 200,
+        "height": 19,
         "content": "저장 주기",
         "styles": {
           "fontSize": 10,
@@ -1770,10 +1786,10 @@
       {
         "id": "c5-spec1-val",
         "type": "text",
-        "x": 48,
-        "y": 710,
-        "width": 150,
-        "height": 18,
+        "x": 32,
+        "y": 915,
+        "width": 200,
+        "height": 24,
         "content": "30분 단위",
         "styles": {
           "fontSize": 14,
@@ -1784,10 +1800,10 @@
       {
         "id": "c5-spec2-lbl",
         "type": "text",
-        "x": 218,
-        "y": 696,
-        "width": 150,
-        "height": 14,
+        "x": 259,
+        "y": 896,
+        "width": 200,
+        "height": 19,
         "content": "월간 데이터 전송",
         "styles": {
           "fontSize": 10,
@@ -1797,10 +1813,10 @@
       {
         "id": "c5-spec2-val",
         "type": "text",
-        "x": 218,
-        "y": 710,
-        "width": 150,
-        "height": 18,
+        "x": 259,
+        "y": 915,
+        "width": 200,
+        "height": 24,
         "content": "약 2분 30초",
         "styles": {
           "fontSize": 14,
@@ -1811,10 +1827,10 @@
       {
         "id": "c5-spec3-lbl",
         "type": "text",
-        "x": 388,
-        "y": 696,
-        "width": 150,
-        "height": 14,
+        "x": 486,
+        "y": 896,
+        "width": 200,
+        "height": 19,
         "content": "연간 데이터 전송",
         "styles": {
           "fontSize": 10,
@@ -1824,10 +1840,10 @@
       {
         "id": "c5-spec3-val",
         "type": "text",
-        "x": 388,
-        "y": 710,
-        "width": 150,
-        "height": 18,
+        "x": 486,
+        "y": 915,
+        "width": 200,
+        "height": 24,
         "content": "약 30분",
         "styles": {
           "fontSize": 14,
@@ -1838,10 +1854,10 @@
       {
         "id": "c5-pagenum",
         "type": "text",
-        "x": 520,
-        "y": 818,
-        "width": 40,
-        "height": 16,
+        "x": 662,
+        "y": 1038,
+        "width": 53,
+        "height": 21,
         "content": "04",
         "styles": {
           "fontSize": 12,
@@ -1854,14 +1870,18 @@
     "id": "catalog-app-1",
     "title": "Application Cases 1",
     "backgroundColor": "#f9fafb",
+    "contentArea": {
+      "margin": 32,
+      "backgroundColor": "#f3f4f6"
+    },
     "elements": [
       {
         "id": "c6-header",
         "type": "shape",
         "x": 0,
         "y": 0,
-        "width": 595,
-        "height": 98,
+        "width": 730,
+        "height": 131,
         "content": "",
         "styles": {
           "backgroundColor": "#1a1a2e"
@@ -1870,10 +1890,10 @@
       {
         "id": "c6-title",
         "type": "text",
-        "x": 32,
-        "y": 32,
-        "width": 400,
-        "height": 30,
+        "x": 11,
+        "y": 11,
+        "width": 534,
+        "height": 40,
         "content": "실제 적용 사례 (1/2)",
         "styles": {
           "fontSize": 24,
@@ -1884,10 +1904,10 @@
       {
         "id": "c6-subtitle",
         "type": "text",
-        "x": 32,
-        "y": 64,
-        "width": 450,
-        "height": 16,
+        "x": 11,
+        "y": 53,
+        "width": 601,
+        "height": 21,
         "content": "FIELD APPLICATION CASE STUDY - INSTALLATION PROCESS",
         "styles": {
           "fontSize": 12,
@@ -1898,10 +1918,10 @@
       {
         "id": "c6-intro",
         "type": "text",
-        "x": 32,
-        "y": 122,
-        "width": 531,
-        "height": 44,
+        "x": 11,
+        "y": 131,
+        "width": 709,
+        "height": 59,
         "content": "본 기술은 실제 교량 구조물에 설치되어 장기간 운영 테스트를 거쳤습니다. 아래는 현장 설치 과정을 단계별로 설명합니다.",
         "styles": {
           "fontSize": 14,
@@ -1912,10 +1932,10 @@
       {
         "id": "c6-step1-box",
         "type": "shape",
-        "x": 32,
-        "y": 182,
-        "width": 531,
-        "height": 140,
+        "x": 11,
+        "y": 211,
+        "width": 709,
+        "height": 187,
         "content": "",
         "styles": {
           "backgroundColor": "#ffffff",
@@ -1926,10 +1946,10 @@
       {
         "id": "c6-step1-img",
         "type": "image",
-        "x": 36,
-        "y": 186,
-        "width": 256,
-        "height": 132,
+        "x": 16,
+        "y": 216,
+        "width": 342,
+        "height": 176,
         "content": "/assets/location.png",
         "styles": {
           "objectFit": "contain"
@@ -1938,10 +1958,10 @@
       {
         "id": "c6-step1-num",
         "type": "shape",
-        "x": 308,
-        "y": 190,
-        "width": 24,
-        "height": 24,
+        "x": 379,
+        "y": 221,
+        "width": 32,
+        "height": 32,
         "content": "",
         "styles": {
           "backgroundColor": "#1a1a2e",
@@ -1951,10 +1971,10 @@
       {
         "id": "c6-step1-num-txt",
         "type": "text",
-        "x": 308,
-        "y": 190,
-        "width": 24,
-        "height": 24,
+        "x": 379,
+        "y": 221,
+        "width": 32,
+        "height": 32,
         "content": "1",
         "styles": {
           "fontSize": 14,
@@ -1966,10 +1986,10 @@
       {
         "id": "c6-step1-title",
         "type": "text",
-        "x": 340,
-        "y": 192,
-        "width": 215,
-        "height": 22,
+        "x": 422,
+        "y": 224,
+        "width": 287,
+        "height": 29,
         "content": "설치 위치 선정",
         "styles": {
           "fontSize": 16,
@@ -1980,10 +2000,10 @@
       {
         "id": "c6-step1-desc",
         "type": "text",
-        "x": 308,
-        "y": 218,
-        "width": 247,
-        "height": 90,
+        "x": 379,
+        "y": 259,
+        "width": 330,
+        "height": 120,
         "content": "교량 하부 구조물(교대, 교각)에서 거더와의 적절한 거리를 확보할 수 있는 위치를 선정합니다.",
         "styles": {
           "fontSize": 14,
@@ -1994,10 +2014,10 @@
       {
         "id": "c6-step2-box",
         "type": "shape",
-        "x": 32,
-        "y": 336,
-        "width": 531,
-        "height": 140,
+        "x": 11,
+        "y": 416,
+        "width": 709,
+        "height": 187,
         "content": "",
         "styles": {
           "backgroundColor": "#ffffff",
@@ -2008,10 +2028,10 @@
       {
         "id": "c6-step2-img",
         "type": "image",
-        "x": 36,
-        "y": 340,
-        "width": 256,
-        "height": 132,
+        "x": 16,
+        "y": 421,
+        "width": 342,
+        "height": 176,
         "content": "/assets/install.png",
         "styles": {
           "objectFit": "contain"
@@ -2020,10 +2040,10 @@
       {
         "id": "c6-step2-num",
         "type": "shape",
-        "x": 308,
-        "y": 344,
-        "width": 24,
-        "height": 24,
+        "x": 379,
+        "y": 427,
+        "width": 32,
+        "height": 32,
         "content": "",
         "styles": {
           "backgroundColor": "#1a1a2e",
@@ -2033,10 +2053,10 @@
       {
         "id": "c6-step2-num-txt",
         "type": "text",
-        "x": 308,
-        "y": 344,
-        "width": 24,
-        "height": 24,
+        "x": 379,
+        "y": 427,
+        "width": 32,
+        "height": 32,
         "content": "2",
         "styles": {
           "fontSize": 14,
@@ -2048,10 +2068,10 @@
       {
         "id": "c6-step2-title",
         "type": "text",
-        "x": 340,
-        "y": 346,
-        "width": 215,
-        "height": 22,
+        "x": 422,
+        "y": 429,
+        "width": 287,
+        "height": 29,
         "content": "덮개판 설치",
         "styles": {
           "fontSize": 16,
@@ -2062,10 +2082,10 @@
       {
         "id": "c6-step2-desc",
         "type": "text",
-        "x": 308,
-        "y": 372,
-        "width": 247,
-        "height": 90,
+        "x": 379,
+        "y": 464,
+        "width": 330,
+        "height": 120,
         "content": "측정 장치를 보호하고 외부 환경으로부터 센서를 보호하기 위한 덮개판을 교량 받침 상부에 설치합니다.",
         "styles": {
           "fontSize": 14,
@@ -2076,10 +2096,10 @@
       {
         "id": "c6-step3-box",
         "type": "shape",
-        "x": 32,
-        "y": 490,
-        "width": 531,
-        "height": 140,
+        "x": 11,
+        "y": 622,
+        "width": 709,
+        "height": 187,
         "content": "",
         "styles": {
           "backgroundColor": "#ffffff",
@@ -2090,10 +2110,10 @@
       {
         "id": "c6-step3-img",
         "type": "image",
-        "x": 36,
-        "y": 494,
-        "width": 256,
-        "height": 132,
+        "x": 16,
+        "y": 627,
+        "width": 342,
+        "height": 176,
         "content": "/assets/Slide.png",
         "styles": {
           "objectFit": "contain"
@@ -2102,10 +2122,10 @@
       {
         "id": "c6-step3-num",
         "type": "shape",
-        "x": 308,
-        "y": 498,
-        "width": 24,
-        "height": 24,
+        "x": 379,
+        "y": 632,
+        "width": 32,
+        "height": 32,
         "content": "",
         "styles": {
           "backgroundColor": "#1a1a2e",
@@ -2115,10 +2135,10 @@
       {
         "id": "c6-step3-num-txt",
         "type": "text",
-        "x": 308,
-        "y": 498,
-        "width": 24,
-        "height": 24,
+        "x": 379,
+        "y": 632,
+        "width": 32,
+        "height": 32,
         "content": "3",
         "styles": {
           "fontSize": 14,
@@ -2130,10 +2150,10 @@
       {
         "id": "c6-step3-title",
         "type": "text",
-        "x": 340,
-        "y": 500,
-        "width": 215,
-        "height": 22,
+        "x": 422,
+        "y": 635,
+        "width": 287,
+        "height": 29,
         "content": "슬라이딩 형식 측정장치 설치",
         "styles": {
           "fontSize": 16,
@@ -2144,10 +2164,10 @@
       {
         "id": "c6-step3-desc",
         "type": "text",
-        "x": 308,
-        "y": 526,
-        "width": 247,
-        "height": 90,
+        "x": 379,
+        "y": 670,
+        "width": 330,
+        "height": 120,
         "content": "덮개판 내부에 슬라이딩 방식으로 측정 장치를 삽입합니다. 이 방식은 유지보수 시 장치 교체를 용이하게 합니다.",
         "styles": {
           "fontSize": 14,
@@ -2158,10 +2178,10 @@
       {
         "id": "c6-pagenum",
         "type": "text",
-        "x": 520,
-        "y": 818,
-        "width": 40,
-        "height": 16,
+        "x": 662,
+        "y": 1038,
+        "width": 53,
+        "height": 21,
         "content": "05",
         "styles": {
           "fontSize": 12,
@@ -2174,14 +2194,18 @@
     "id": "catalog-app-2",
     "title": "Application Cases 2",
     "backgroundColor": "#f9fafb",
+    "contentArea": {
+      "margin": 32,
+      "backgroundColor": "#f3f4f6"
+    },
     "elements": [
       {
         "id": "c7-header",
         "type": "shape",
         "x": 0,
         "y": 0,
-        "width": 595,
-        "height": 98,
+        "width": 730,
+        "height": 131,
         "content": "",
         "styles": {
           "backgroundColor": "#1a1a2e"
@@ -2190,10 +2214,10 @@
       {
         "id": "c7-title",
         "type": "text",
-        "x": 32,
-        "y": 32,
-        "width": 400,
-        "height": 30,
+        "x": 11,
+        "y": 11,
+        "width": 534,
+        "height": 40,
         "content": "실제 적용 사례 (2/2)",
         "styles": {
           "fontSize": 24,
@@ -2204,10 +2228,10 @@
       {
         "id": "c7-subtitle",
         "type": "text",
-        "x": 32,
-        "y": 64,
-        "width": 450,
-        "height": 16,
+        "x": 11,
+        "y": 53,
+        "width": 601,
+        "height": 21,
         "content": "FIELD APPLICATION CASE STUDY - DATA COLLECTION",
         "styles": {
           "fontSize": 12,
@@ -2218,10 +2242,10 @@
       {
         "id": "c7-step4-box",
         "type": "shape",
-        "x": 32,
-        "y": 110,
-        "width": 531,
-        "height": 140,
+        "x": 11,
+        "y": 115,
+        "width": 709,
+        "height": 187,
         "content": "",
         "styles": {
           "backgroundColor": "#ffffff",
@@ -2232,10 +2256,10 @@
       {
         "id": "c7-step4-img",
         "type": "image",
-        "x": 36,
-        "y": 114,
-        "width": 256,
-        "height": 132,
+        "x": 16,
+        "y": 120,
+        "width": 342,
+        "height": 176,
         "content": "/assets/figure.png",
         "styles": {
           "objectFit": "contain"
@@ -2244,10 +2268,10 @@
       {
         "id": "c7-step4-num",
         "type": "shape",
-        "x": 308,
-        "y": 118,
-        "width": 24,
-        "height": 24,
+        "x": 379,
+        "y": 125,
+        "width": 32,
+        "height": 32,
         "content": "",
         "styles": {
           "backgroundColor": "#1a1a2e",
@@ -2257,10 +2281,10 @@
       {
         "id": "c7-step4-num-txt",
         "type": "text",
-        "x": 308,
-        "y": 118,
-        "width": 24,
-        "height": 24,
+        "x": 379,
+        "y": 125,
+        "width": 32,
+        "height": 32,
         "content": "4",
         "styles": {
           "fontSize": 14,
@@ -2272,10 +2296,10 @@
       {
         "id": "c7-step4-title",
         "type": "text",
-        "x": 340,
-        "y": 120,
-        "width": 215,
-        "height": 22,
+        "x": 422,
+        "y": 128,
+        "width": 287,
+        "height": 29,
         "content": "측정기준판 및 배터리 연결",
         "styles": {
           "fontSize": 16,
@@ -2286,10 +2310,10 @@
       {
         "id": "c7-step4-desc",
         "type": "text",
-        "x": 308,
-        "y": 146,
-        "width": 247,
-        "height": 90,
+        "x": 379,
+        "y": 163,
+        "width": 330,
+        "height": 120,
         "content": "하부 구조물에 측정 기준판을 부착하고, 측정 장치에 전원(배터리)을 연결합니다.",
         "styles": {
           "fontSize": 14,
@@ -2300,10 +2324,10 @@
       {
         "id": "c7-step5-box",
         "type": "shape",
-        "x": 32,
-        "y": 264,
-        "width": 531,
-        "height": 140,
+        "x": 11,
+        "y": 320,
+        "width": 709,
+        "height": 187,
         "content": "",
         "styles": {
           "backgroundColor": "#ffffff",
@@ -2314,10 +2338,10 @@
       {
         "id": "c7-step5-img",
         "type": "image",
-        "x": 36,
-        "y": 268,
-        "width": 256,
-        "height": 132,
+        "x": 16,
+        "y": 325,
+        "width": 342,
+        "height": 176,
         "content": "/assets/start.png",
         "styles": {
           "objectFit": "contain"
@@ -2326,10 +2350,10 @@
       {
         "id": "c7-step5-num",
         "type": "shape",
-        "x": 308,
-        "y": 272,
-        "width": 24,
-        "height": 24,
+        "x": 379,
+        "y": 331,
+        "width": 32,
+        "height": 32,
         "content": "",
         "styles": {
           "backgroundColor": "#1a1a2e",
@@ -2339,10 +2363,10 @@
       {
         "id": "c7-step5-num-txt",
         "type": "text",
-        "x": 308,
-        "y": 272,
-        "width": 24,
-        "height": 24,
+        "x": 379,
+        "y": 331,
+        "width": 32,
+        "height": 32,
         "content": "5",
         "styles": {
           "fontSize": 14,
@@ -2354,10 +2378,10 @@
       {
         "id": "c7-step5-title",
         "type": "text",
-        "x": 340,
-        "y": 274,
-        "width": 215,
-        "height": 22,
+        "x": 422,
+        "y": 333,
+        "width": 287,
+        "height": 29,
         "content": "설치 완료 및 측정 시작",
         "styles": {
           "fontSize": 16,
@@ -2368,10 +2392,10 @@
       {
         "id": "c7-step5-desc",
         "type": "text",
-        "x": 308,
-        "y": 300,
-        "width": 247,
-        "height": 90,
+        "x": 379,
+        "y": 368,
+        "width": 330,
+        "height": 120,
         "content": "모든 연결을 확인한 후 시스템을 가동합니다. RTC 모듈이 현재 시간을 기록하고 데이터가 자동 저장됩니다.",
         "styles": {
           "fontSize": 14,
@@ -2382,10 +2406,10 @@
       {
         "id": "c7-step6-box",
         "type": "shape",
-        "x": 32,
-        "y": 418,
-        "width": 531,
-        "height": 140,
+        "x": 11,
+        "y": 525,
+        "width": 709,
+        "height": 187,
         "content": "",
         "styles": {
           "backgroundColor": "#ffffff",
@@ -2396,10 +2420,10 @@
       {
         "id": "c7-step6-img",
         "type": "image",
-        "x": 36,
-        "y": 422,
-        "width": 256,
-        "height": 132,
+        "x": 16,
+        "y": 531,
+        "width": 342,
+        "height": 176,
         "content": "/assets/data.png",
         "styles": {
           "objectFit": "contain"
@@ -2408,10 +2432,10 @@
       {
         "id": "c7-step6-num",
         "type": "shape",
-        "x": 308,
-        "y": 426,
-        "width": 24,
-        "height": 24,
+        "x": 379,
+        "y": 536,
+        "width": 32,
+        "height": 32,
         "content": "",
         "styles": {
           "backgroundColor": "#1a1a2e",
@@ -2421,10 +2445,10 @@
       {
         "id": "c7-step6-num-txt",
         "type": "text",
-        "x": 308,
-        "y": 426,
-        "width": 24,
-        "height": 24,
+        "x": 379,
+        "y": 536,
+        "width": 32,
+        "height": 32,
         "content": "6",
         "styles": {
           "fontSize": 14,
@@ -2436,10 +2460,10 @@
       {
         "id": "c7-step6-title",
         "type": "text",
-        "x": 340,
-        "y": 428,
-        "width": 215,
-        "height": 22,
+        "x": 422,
+        "y": 539,
+        "width": 287,
+        "height": 29,
         "content": "데이터 수집",
         "styles": {
           "fontSize": 16,
@@ -2450,10 +2474,10 @@
       {
         "id": "c7-step6-desc",
         "type": "text",
-        "x": 308,
-        "y": 454,
-        "width": 247,
-        "height": 90,
+        "x": 379,
+        "y": 574,
+        "width": 330,
+        "height": 120,
         "content": "모바일 어플리케이션을 통해 블루투스로 장치에 접속하여 저장된 데이터를 조회하고 클라우드로 전송합니다.",
         "styles": {
           "fontSize": 14,
@@ -2464,10 +2488,10 @@
       {
         "id": "c7-stats-box",
         "type": "shape",
-        "x": 32,
-        "y": 580,
-        "width": 531,
-        "height": 100,
+        "x": 11,
+        "y": 742,
+        "width": 709,
+        "height": 133,
         "content": "",
         "styles": {
           "backgroundColor": "#f3f4f6",
@@ -2477,10 +2501,10 @@
       {
         "id": "c7-stats-lbl",
         "type": "text",
-        "x": 32,
-        "y": 592,
-        "width": 531,
-        "height": 20,
+        "x": 11,
+        "y": 758,
+        "width": 709,
+        "height": 27,
         "content": "시스템 운영 현황",
         "styles": {
           "fontSize": 14,
@@ -2491,10 +2515,10 @@
       {
         "id": "c7-stat1-val",
         "type": "text",
-        "x": 80,
-        "y": 622,
-        "width": 100,
-        "height": 28,
+        "x": 75,
+        "y": 798,
+        "width": 133,
+        "height": 37,
         "content": "3",
         "styles": {
           "fontSize": 20,
@@ -2506,10 +2530,10 @@
       {
         "id": "c7-stat1-lbl",
         "type": "text",
-        "x": 80,
-        "y": 648,
-        "width": 100,
-        "height": 14,
+        "x": 75,
+        "y": 832,
+        "width": 133,
+        "height": 19,
         "content": "등록 특허",
         "styles": {
           "fontSize": 10,
@@ -2520,10 +2544,10 @@
       {
         "id": "c7-stat2-val",
         "type": "text",
-        "x": 208,
-        "y": 622,
-        "width": 100,
-        "height": 28,
+        "x": 246,
+        "y": 798,
+        "width": 133,
+        "height": 37,
         "content": "24h",
         "styles": {
           "fontSize": 20,
@@ -2535,10 +2559,10 @@
       {
         "id": "c7-stat2-lbl",
         "type": "text",
-        "x": 208,
-        "y": 648,
-        "width": 100,
-        "height": 14,
+        "x": 246,
+        "y": 832,
+        "width": 133,
+        "height": 19,
         "content": "연속 모니터링",
         "styles": {
           "fontSize": 10,
@@ -2549,10 +2573,10 @@
       {
         "id": "c7-stat3-val",
         "type": "text",
-        "x": 336,
-        "y": 622,
-        "width": 100,
-        "height": 28,
+        "x": 416,
+        "y": 798,
+        "width": 133,
+        "height": 37,
         "content": "3축",
         "styles": {
           "fontSize": 20,
@@ -2564,10 +2588,10 @@
       {
         "id": "c7-stat3-lbl",
         "type": "text",
-        "x": 336,
-        "y": 648,
-        "width": 100,
-        "height": 14,
+        "x": 416,
+        "y": 832,
+        "width": 133,
+        "height": 19,
         "content": "동시 측정",
         "styles": {
           "fontSize": 10,
@@ -2578,10 +2602,10 @@
       {
         "id": "c7-stat4-val",
         "type": "text",
-        "x": 464,
-        "y": 622,
-        "width": 100,
-        "height": 28,
+        "x": 587,
+        "y": 798,
+        "width": 133,
+        "height": 37,
         "content": "1mm",
         "styles": {
           "fontSize": 20,
@@ -2593,10 +2617,10 @@
       {
         "id": "c7-stat4-lbl",
         "type": "text",
-        "x": 464,
-        "y": 648,
-        "width": 100,
-        "height": 14,
+        "x": 587,
+        "y": 832,
+        "width": 133,
+        "height": 19,
         "content": "측정 정밀도",
         "styles": {
           "fontSize": 10,
@@ -2607,10 +2631,10 @@
       {
         "id": "c7-pagenum",
         "type": "text",
-        "x": 520,
-        "y": 818,
-        "width": 40,
-        "height": 16,
+        "x": 662,
+        "y": 1038,
+        "width": 53,
+        "height": 21,
         "content": "06",
         "styles": {
           "fontSize": 12,
@@ -2623,14 +2647,18 @@
     "id": "catalog-results",
     "title": "Results",
     "backgroundColor": "#f9fafb",
+    "contentArea": {
+      "margin": 32,
+      "backgroundColor": "#f3f4f6"
+    },
     "elements": [
       {
         "id": "c8-header",
         "type": "shape",
         "x": 0,
         "y": 0,
-        "width": 595,
-        "height": 98,
+        "width": 730,
+        "height": 131,
         "content": "",
         "styles": {
           "backgroundColor": "#1a1a2e"
@@ -2639,10 +2667,10 @@
       {
         "id": "c8-title",
         "type": "text",
-        "x": 32,
-        "y": 32,
-        "width": 400,
-        "height": 30,
+        "x": 11,
+        "y": 11,
+        "width": 534,
+        "height": 40,
         "content": "측정 결과 및 분석",
         "styles": {
           "fontSize": 24,
@@ -2653,10 +2681,10 @@
       {
         "id": "c8-subtitle",
         "type": "text",
-        "x": 32,
-        "y": 64,
-        "width": 450,
-        "height": 16,
+        "x": 11,
+        "y": 53,
+        "width": 601,
+        "height": 21,
         "content": "MEASUREMENT RESULTS & ANALYSIS",
         "styles": {
           "fontSize": 12,
@@ -2667,10 +2695,10 @@
       {
         "id": "c8-data-lbl",
         "type": "text",
-        "x": 32,
-        "y": 122,
-        "width": 531,
-        "height": 22,
+        "x": 11,
+        "y": 131,
+        "width": 709,
+        "height": 29,
         "content": "DATA COLLECTION RESULTS",
         "styles": {
           "fontSize": 18,
@@ -2681,10 +2709,10 @@
       {
         "id": "c8-data-desc",
         "type": "text",
-        "x": 32,
-        "y": 148,
-        "width": 531,
-        "height": 44,
+        "x": 11,
+        "y": 165,
+        "width": 709,
+        "height": 59,
         "content": "본 시스템을 통해 수집된 데이터는 구글 스프레드시트로 자동 전송되어 실시간으로 모니터링됩니다. 측정 데이터에는 날짜, 시간, 교량명, 온도, 그리고 3축(교축, 교직, 상하) 방향의 변위값이 포함됩니다.",
         "styles": {
           "fontSize": 14,
@@ -2695,10 +2723,10 @@
       {
         "id": "c8-graph-lbl",
         "type": "text",
-        "x": 32,
-        "y": 208,
-        "width": 531,
-        "height": 22,
+        "x": 11,
+        "y": 245,
+        "width": 709,
+        "height": 29,
         "content": "결과 그래프",
         "styles": {
           "fontSize": 18,
@@ -2709,10 +2737,10 @@
       {
         "id": "c8-graph-box",
         "type": "shape",
-        "x": 32,
-        "y": 236,
-        "width": 531,
-        "height": 260,
+        "x": 11,
+        "y": 283,
+        "width": 709,
+        "height": 331,
         "content": "",
         "styles": {
           "backgroundColor": "#ffffff",
@@ -2723,10 +2751,10 @@
       {
         "id": "c8-graph",
         "type": "image",
-        "x": 44,
-        "y": 248,
-        "width": 507,
-        "height": 228,
+        "x": 27,
+        "y": 299,
+        "width": 677,
+        "height": 288,
         "content": "/assets/Graph.png",
         "styles": {
           "objectFit": "contain"
@@ -2735,10 +2763,10 @@
       {
         "id": "c8-graph-cap",
         "type": "text",
-        "x": 32,
-        "y": 492,
-        "width": 531,
-        "height": 16,
+        "x": 11,
+        "y": 608,
+        "width": 709,
+        "height": 21,
         "content": "온도 및 3개 측정값 동시 표시 그래프 (2025년 9월 측정 데이터)",
         "styles": {
           "fontSize": 10,
@@ -2749,10 +2777,10 @@
       {
         "id": "c8-guide-box",
         "type": "shape",
-        "x": 32,
-        "y": 522,
-        "width": 531,
-        "height": 140,
+        "x": 11,
+        "y": 648,
+        "width": 709,
+        "height": 171,
         "content": "",
         "styles": {
           "backgroundColor": "#f3f4f6",
@@ -2762,10 +2790,10 @@
       {
         "id": "c8-guide-lbl",
         "type": "text",
-        "x": 48,
-        "y": 534,
-        "width": 200,
-        "height": 18,
+        "x": 32,
+        "y": 664,
+        "width": 267,
+        "height": 24,
         "content": "그래프 해석 가이드",
         "styles": {
           "fontSize": 14,
@@ -2776,9 +2804,9 @@
       {
         "id": "c8-guide1-color",
         "type": "shape",
-        "x": 48,
-        "y": 562,
-        "width": 12,
+        "x": 32,
+        "y": 702,
+        "width": 16,
         "height": 4,
         "content": "",
         "styles": {
@@ -2789,10 +2817,10 @@
       {
         "id": "c8-guide1",
         "type": "text",
-        "x": 64,
-        "y": 556,
-        "width": 230,
-        "height": 44,
+        "x": 53,
+        "y": 694,
+        "width": 307,
+        "height": 59,
         "content": "온도 (Temperature)\n일교차에 따른 온도 변화 패턴. 교량 거동과 강한 상관관계를 보임.",
         "styles": {
           "fontSize": 11,
@@ -2803,9 +2831,9 @@
       {
         "id": "c8-guide2-color",
         "type": "shape",
-        "x": 318,
-        "y": 562,
-        "width": 12,
+        "x": 392,
+        "y": 702,
+        "width": 16,
         "height": 4,
         "content": "",
         "styles": {
@@ -2816,10 +2844,10 @@
       {
         "id": "c8-guide2",
         "type": "text",
-        "x": 334,
-        "y": 556,
-        "width": 217,
-        "height": 44,
+        "x": 414,
+        "y": 694,
+        "width": 290,
+        "height": 59,
         "content": "교축 방향 변위\n교량 길이 방향의 신축. 온도 상승 시 팽창, 하강 시 수축.",
         "styles": {
           "fontSize": 11,
@@ -2830,9 +2858,9 @@
       {
         "id": "c8-guide3-color",
         "type": "shape",
-        "x": 48,
-        "y": 612,
-        "width": 12,
+        "x": 32,
+        "y": 768,
+        "width": 16,
         "height": 4,
         "content": "",
         "styles": {
@@ -2843,10 +2871,10 @@
       {
         "id": "c8-guide3",
         "type": "text",
-        "x": 64,
-        "y": 606,
-        "width": 230,
-        "height": 44,
+        "x": 53,
+        "y": 760,
+        "width": 307,
+        "height": 59,
         "content": "교직 방향 변위\n교량 폭 방향의 이동. 정상 상태에서는 미미한 변화.",
         "styles": {
           "fontSize": 11,
@@ -2857,9 +2885,9 @@
       {
         "id": "c8-guide4-color",
         "type": "shape",
-        "x": 318,
-        "y": 612,
-        "width": 12,
+        "x": 392,
+        "y": 768,
+        "width": 16,
         "height": 4,
         "content": "",
         "styles": {
@@ -2870,10 +2898,10 @@
       {
         "id": "c8-guide4",
         "type": "text",
-        "x": 334,
-        "y": 606,
-        "width": 217,
-        "height": 44,
+        "x": 414,
+        "y": 760,
+        "width": 290,
+        "height": 59,
         "content": "상하 방향 변위\n수직 방향의 처짐. 하중 및 온도에 따른 변화 모니터링.",
         "styles": {
           "fontSize": 11,
@@ -2884,10 +2912,10 @@
       {
         "id": "c8-anomaly-lbl",
         "type": "text",
-        "x": 32,
-        "y": 680,
-        "width": 531,
-        "height": 22,
+        "x": 11,
+        "y": 859,
+        "width": 709,
+        "height": 29,
         "content": "이상 거동 판단",
         "styles": {
           "fontSize": 18,
@@ -2898,10 +2926,10 @@
       {
         "id": "c8-anomaly-desc",
         "type": "text",
-        "x": 32,
-        "y": 706,
-        "width": 531,
-        "height": 36,
+        "x": 11,
+        "y": 894,
+        "width": 709,
+        "height": 48,
         "content": "수집된 장기 데이터를 분석하여 교량의 정상 거동 패턴을 학습하고, 이를 벗어나는 이상 거동을 조기에 감지할 수 있습니다.",
         "styles": {
           "fontSize": 14,
@@ -2912,10 +2940,10 @@
       {
         "id": "c8-criteria-box",
         "type": "shape",
-        "x": 32,
-        "y": 752,
-        "width": 531,
-        "height": 58,
+        "x": 11,
+        "y": 955,
+        "width": 709,
+        "height": 77,
         "content": "",
         "styles": {
           "backgroundColor": "#ffffff",
@@ -2926,10 +2954,10 @@
       {
         "id": "c8-criteria-lbl",
         "type": "text",
-        "x": 40,
-        "y": 762,
-        "width": 200,
-        "height": 16,
+        "x": 21,
+        "y": 968,
+        "width": 267,
+        "height": 21,
         "content": "이상 거동 판단 기준",
         "styles": {
           "fontSize": 12,
@@ -2940,10 +2968,10 @@
       {
         "id": "c8-criteria",
         "type": "text",
-        "x": 40,
-        "y": 778,
-        "width": 515,
-        "height": 38,
+        "x": 21,
+        "y": 990,
+        "width": 687,
+        "height": 51,
         "content": "• 온도 변화와 무관한 급격한 변위 발생\n• 과거 동일 온도 조건 대비 변위량 편차 증가\n• 교직 또는 상하 방향의 비정상적 증가 추세\n• 설계 허용치 초과 변위 발생",
         "styles": {
           "fontSize": 10,
@@ -2954,10 +2982,10 @@
       {
         "id": "c8-pagenum",
         "type": "text",
-        "x": 520,
-        "y": 818,
-        "width": 40,
-        "height": 16,
+        "x": 662,
+        "y": 1038,
+        "width": 53,
+        "height": 21,
         "content": "07",
         "styles": {
           "fontSize": 12,

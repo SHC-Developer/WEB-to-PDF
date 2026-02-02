@@ -10,6 +10,7 @@ export interface EditorElement {
   height: number;
   rotation?: number;
   locked?: boolean;
+  groupId?: string;
   styles: {
     backgroundColor?: string;
     color?: string;
@@ -36,11 +37,19 @@ export interface EditorElement {
   };
 }
 
+/** 커버 제외 페이지에서 콘텐츠 영역(여백 + 희미한 회색 배경) */
+export interface ContentArea {
+  margin: number;
+  backgroundColor?: string;
+}
+
 export interface Page {
   id: string;
   title: string;
   elements: EditorElement[];
   backgroundColor: string;
+  /** 있으면 해당 페이지에 여백과 콘텐츠 영역 배경 적용 (커버 제외 시 사용) */
+  contentArea?: ContentArea;
 }
 
 export interface AppState {

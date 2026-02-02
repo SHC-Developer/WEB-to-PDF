@@ -5,8 +5,9 @@ import { Toolbar } from './components/Toolbar';
 import { Canvas } from './components/Canvas';
 import { PropertiesPanel } from './components/PropertiesPanel';
 import { StaticPage } from './components/StaticPage';
-import { INITIAL_PAGES } from './constants';
+import { INITIAL_PAGES, PAGE_WIDTH, PAGE_HEIGHT } from './constants';
 import { CATALOG_PAGES } from './Templates/catalog/catalog';
+import { RENEWAL_CATALOG_PAGES } from './Templates/catalog/catalog-renewal';
 import { Page, EditorElement } from './types';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
@@ -21,13 +22,18 @@ function App() {
 
   // Clipboard State
   const [clipboardPage, setClipboardPage] = useState<Page | null>(null);
+  const [clipboardElement, setClipboardElement] = useState<EditorElement | null>(null);
 
   const [activePageIndex, setActivePageIndex] = useState(0);
-  const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
+  const [selectedElementIds, setSelectedElementIds] = useState<string[]>([]);
+  const selectedElementId = selectedElementIds[0] ?? null;
   const [scale, setScale] = useState(0.8);
   const [showGrid, setShowGrid] = useState(false);
   const [isDoublePage, setIsDoublePage] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  /** 프로젝트 저장 시 선택한 파일 핸들 (Ctrl+S 두 번째부터 같은 파일에 덮어쓰기) */
+  const projectFileHandleRef = useRef<FileSystemFileHandle | null>(null);
 
   // Helper to get active page
   const activePage = pages[activePageIndex];
@@ -108,7 +114,6 @@ function App() {
   };
 
   const handleAddImage = () => {
-    // Simulation of file upload
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
@@ -117,18 +122,36 @@ function App() {
       if (file) {
         const reader = new FileReader();
         reader.onload = (readerEvent) => {
-           saveHistory();
-           const newElement: EditorElement = {
-            id: `img-${Date.now()}`,
-            type: 'image',
-            x: 150,
-            y: 150,
-            width: 300,
-            height: 200,
-            content: readerEvent.target?.result as string,
-            styles: {}
+          const dataUrl = readerEvent.target?.result as string;
+          const img = new Image();
+          img.onload = () => {
+            saveHistory();
+            const newElement: EditorElement = {
+              id: `img-${Date.now()}`,
+              type: 'image',
+              x: 150,
+              y: 150,
+              width: img.naturalWidth,
+              height: img.naturalHeight,
+              content: dataUrl,
+              styles: { objectFit: 'contain' }
+            };
+            addContentToPage(newElement);
           };
-          addContentToPage(newElement);
+          img.onerror = () => {
+            saveHistory();
+            addContentToPage({
+              id: `img-${Date.now()}`,
+              type: 'image',
+              x: 150,
+              y: 150,
+              width: 300,
+              height: 200,
+              content: dataUrl,
+              styles: { objectFit: 'contain' }
+            });
+          };
+          img.src = dataUrl;
         };
         reader.readAsDataURL(file);
       }
@@ -159,7 +182,7 @@ function App() {
       if (idx !== activePageIndex) return p;
       return { ...p, elements: [...p.elements, element] };
     }));
-    setSelectedElementId(element.id);
+    setSelectedElementIds([element.id]);
   };
 
   // --- Updates ---
@@ -180,25 +203,72 @@ function App() {
     }));
   };
 
+  const handleUpdateElements = (updates: { id: string; updates: Partial<EditorElement> }[]) => {
+    if (updates.length === 0) return;
+    const byId = new Map(updates.map(u => [u.id, u.updates]));
+    setPages(prev => prev.map(page => ({
+      ...page,
+      elements: page.elements.map(el => {
+        const u = byId.get(el.id);
+        return u ? { ...el, ...u } : el;
+      })
+    })));
+  };
+
   const handleDeleteElement = (id: string) => {
     saveHistory();
     setPages(prev => prev.map(page => ({
       ...page,
       elements: page.elements.filter(el => el.id !== id)
     })));
-    setSelectedElementId(null);
+    setSelectedElementIds(prev => prev.filter(i => i !== id));
+  };
+
+  const handleDeleteSelected = () => {
+    if (selectedElementIds.length === 0) return;
+    saveHistory();
+    const ids = new Set(selectedElementIds);
+    setPages(prev => prev.map(page => ({
+      ...page,
+      elements: page.elements.filter(el => !ids.has(el.id))
+    })));
+    setSelectedElementIds([]);
   };
 
   const handleDuplicateElement = (id: string) => {
     if (!selectedElement) return;
     saveHistory();
-    const newEl = {
-      ...selectedElement,
+    const newEl: EditorElement = {
+      ...JSON.parse(JSON.stringify(selectedElement)),
       id: `${selectedElement.type}-${Date.now()}`,
       x: selectedElement.x + 20,
       y: selectedElement.y + 20
     };
     addContentToPage(newEl);
+  };
+
+  const handleGroup = () => {
+    if (selectedElementIds.length < 2) return;
+    saveHistory();
+    const groupId = `group-${Date.now()}`;
+    setPages(prev => prev.map(page => ({
+      ...page,
+      elements: page.elements.map(el =>
+        selectedElementIds.includes(el.id) ? { ...el, groupId } : el
+      )
+    })));
+  };
+
+  const handleUngroup = () => {
+    if (selectedElementIds.length === 0) return;
+    saveHistory();
+    const ids = new Set(selectedElementIds);
+    setPages(prev => prev.map(page => ({
+      ...page,
+      elements: page.elements.map(el =>
+        ids.has(el.id) ? { ...el, groupId: undefined } : el
+      )
+    })));
   };
 
   const handleLayerChange = (id: string, direction: 'front' | 'back') => {
@@ -260,13 +330,15 @@ function App() {
   const handleLoadBuiltInTemplate = useCallback((templateId: string) => {
     if (templateId === 'catalog') {
       setPages(JSON.parse(JSON.stringify(CATALOG_PAGES)));
+    } else if (templateId === 'catalog-renewal') {
+      setPages(JSON.parse(JSON.stringify(RENEWAL_CATALOG_PAGES)));
     } else {
       setPages(JSON.parse(JSON.stringify(INITIAL_PAGES)));
     }
     setHistory([]);
     setFuture([]);
     setActivePageIndex(0);
-    setSelectedElementId(null);
+    setSelectedElementIds([]);
   }, []);
 
   const handleLoadTemplateFromFile = useCallback((file: File) => {
@@ -286,7 +358,7 @@ function App() {
         setHistory([]);
         setFuture([]);
         setActivePageIndex(0);
-        setSelectedElementId(null);
+        setSelectedElementIds([]);
       } catch (err) {
         console.error('Template load error:', err);
         alert('템플릿 파일을 불러올 수 없습니다. 형식이 올바른 JSON(Page[])인지 확인해주세요.');
@@ -319,15 +391,17 @@ function App() {
       for (let i = 0; i < pageElements.length; i++) {
         const pageEl = pageElements[i] as HTMLElement;
         
-        // High quality scale
+        // 고정 크기로 캡처해 PDF 비율(210:297)과 일치시킴 → 이미지 세로 눌림 방지
         const canvas = await html2canvas(pageEl, {
-          scale: 2, 
+          width: PAGE_WIDTH,
+          height: PAGE_HEIGHT,
+          scale: 2,
           useCORS: true,
           logging: false,
           scrollY: 0,
           scrollX: 0,
-          windowWidth: document.documentElement.offsetWidth,
-          windowHeight: document.documentElement.offsetHeight
+          windowWidth: PAGE_WIDTH,
+          windowHeight: PAGE_HEIGHT,
         });
 
         const imgData = canvas.toDataURL('image/jpeg', 0.95);
@@ -336,7 +410,7 @@ function App() {
           pdf.addPage();
         }
 
-        // Add image to PDF, filling the page
+        // 캡처 비율(794:1123 ≈ A4) 그대로 PDF에 맞춤
         pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
       }
 
@@ -350,6 +424,49 @@ function App() {
     }
   };
 
+  // 프로젝트 저장: 첫 저장 = 다른 이름으로 저장(파일 선택), 이후 = 같은 파일에 덮어쓰기
+  const handleSaveProject = useCallback(async () => {
+    const json = JSON.stringify(pages, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+
+    const writeToHandle = async (handle: FileSystemFileHandle) => {
+      const writable = await handle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+    };
+
+    try {
+      if (projectFileHandleRef.current) {
+        await writeToHandle(projectFileHandleRef.current);
+        alert(`전체 ${pages.length}개 페이지가 저장되었습니다.`);
+        return;
+      }
+
+      if (typeof (window as unknown as { showSaveFilePicker?: unknown }).showSaveFilePicker === 'function') {
+        const handle = await (window as unknown as { showSaveFilePicker: (opts: { suggestedName?: string; types?: { description: string; accept: Record<string, string[]> }[] }) => Promise<FileSystemFileHandle> }).showSaveFilePicker({
+          suggestedName: `project-${new Date().toISOString().slice(0, 10)}.json`,
+          types: [{ description: 'JSON 프로젝트', accept: { 'application/json': ['.json'] } }],
+        });
+        projectFileHandleRef.current = handle;
+        await writeToHandle(handle);
+        alert(`전체 ${pages.length}개 페이지가 저장되었습니다.\n같은 파일에 Ctrl+S로 덮어쓸 수 있습니다.`);
+        return;
+      }
+
+      // Fallback: 브라우저가 showSaveFilePicker 미지원 시 다운로드
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `project-${new Date().toISOString().slice(0, 10)}-${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      alert(`전체 ${pages.length}개 페이지가 저장되었습니다.\n파일에서 불러오기로 복원할 수 있습니다.`);
+    } catch (err) {
+      if ((err as { name?: string })?.name === 'AbortError') return;
+      console.error(err);
+      alert('저장 중 오류가 발생했습니다.');
+    }
+  }, [pages]);
 
   // Keyboard Shortcuts
   useEffect(() => {
@@ -361,7 +478,11 @@ function App() {
       // Copy (Ctrl+C / Cmd+C)
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
         if (!isInput) {
-          if (!selectedElementId) {
+          e.preventDefault();
+          const el = visiblePages.flatMap(p => p.elements).find(e => e.id === selectedElementId);
+          if (selectedElementId && el) {
+            setClipboardElement(JSON.parse(JSON.stringify(el)));
+          } else {
             setClipboardPage(pages[activePageIndex]);
           }
         }
@@ -370,7 +491,24 @@ function App() {
       // Paste (Ctrl+V / Cmd+V)
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') {
         if (!isInput) {
-          if (!selectedElementId && clipboardPage) {
+          e.preventDefault();
+          if (clipboardElement) {
+            saveHistory();
+            const newId = `${clipboardElement.type}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            const pasted: EditorElement = {
+              ...JSON.parse(JSON.stringify(clipboardElement)),
+              id: newId,
+              x: clipboardElement.x + 20,
+              y: clipboardElement.y + 20,
+            };
+            const nextPages = pages.map((p, i) =>
+              i === activePageIndex
+                ? { ...p, elements: [...p.elements, pasted] }
+                : p
+            );
+            setPages(nextPages);
+            setSelectedElementIds([newId]);
+          } else if (!selectedElementId && clipboardPage) {
              saveHistory();
              const newPage: Page = {
                ...JSON.parse(JSON.stringify(clipboardPage)),
@@ -381,13 +519,18 @@ function App() {
                  id: `${el.type}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
                }))
              };
-
              const newPages = [...pages];
              newPages.splice(activePageIndex + 1, 0, newPage);
              setPages(newPages);
              setActivePageIndex(activePageIndex + 1);
           }
         }
+      }
+
+      // Save project (Ctrl+S / Cmd+S)
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        handleSaveProject();
       }
 
       // Undo/Redo (Ctrl+Z)
@@ -402,15 +545,62 @@ function App() {
         }
       }
 
-      if (e.key === 'Delete' && selectedElementId) {
+      if (e.key === 'Delete' && selectedElementIds.length > 0) {
         if (!isInput) {
-           handleDeleteElement(selectedElementId);
+          e.preventDefault();
+          handleDeleteSelected();
+        }
+      }
+
+      // Arrow keys: move selected element(s) by 1px
+      const arrowKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
+      if (!isInput && selectedElementIds.length > 0 && arrowKeys.includes(e.key)) {
+        e.preventDefault();
+        const dx = e.key === 'ArrowLeft' ? -1 : e.key === 'ArrowRight' ? 1 : 0;
+        const dy = e.key === 'ArrowUp' ? -1 : e.key === 'ArrowDown' ? 1 : 0;
+        saveHistory();
+        const updates = selectedElementIds.flatMap(id => {
+          for (const p of pages) {
+            const el = p.elements.find(el => el.id === id);
+            if (el) return [{ id, updates: { x: el.x + dx, y: el.y + dy } as Partial<EditorElement> }];
+          }
+          return [];
+        });
+        handleUpdateElements(updates);
+      }
+
+      // 글자 좌우 간격: Alt+Shift+N (-0.1px), Alt+Shift+W (+0.1px)
+      if (e.altKey && e.shiftKey && (e.key.toLowerCase() === 'n' || e.key.toLowerCase() === 'w')) {
+        const textUpdates = selectedElementIds.flatMap(id => {
+          for (const p of pages) {
+            const el = p.elements.find(el => el.id === id);
+            if (el && el.type === 'text') {
+              const current = el.styles.letterSpacing ?? 0;
+              const delta = e.key.toLowerCase() === 'n' ? -0.1 : 0.1;
+              const next = Math.round((current + delta) * 10) / 10;
+              return [{ id, nextLetterSpacing: next }];
+            }
+          }
+          return [];
+        });
+        if (textUpdates.length > 0) {
+          e.preventDefault();
+          saveHistory();
+          const byId = new Map(textUpdates.map(u => [u.id, u.nextLetterSpacing]));
+          setPages(prev => prev.map(page => ({
+            ...page,
+            elements: page.elements.map(el => {
+              const next = byId.get(el.id);
+              if (next === undefined || el.type !== 'text') return el;
+              return { ...el, styles: { ...el.styles, letterSpacing: next } };
+            }),
+          })));
         }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedElementId, undo, redo, handleDeleteElement, pages, activePageIndex, clipboardPage, saveHistory]);
+  }, [selectedElementIds, undo, redo, handleDeleteSelected, handleUpdateElement, handleUpdateElements, handleDeleteElement, handleSaveProject, pages, activePageIndex, clipboardPage, clipboardElement, visiblePages, saveHistory]);
 
 
   return (
@@ -421,6 +611,7 @@ function App() {
         scale={scale} setScale={setScale}
         onUndo={undo} onRedo={redo}
         onSave={handleSave}
+        onSaveProject={handleSaveProject}
         isSaving={isSaving}
         onLoadBuiltInTemplate={handleLoadBuiltInTemplate}
         onLoadTemplateFromFile={handleLoadTemplateFromFile}
@@ -443,7 +634,7 @@ function App() {
           activePageIndex={activePageIndex}
           onPageSelect={(index) => {
             setActivePageIndex(index);
-            setSelectedElementId(null);
+            setSelectedElementIds([]);
           }}
           onAddPage={() => {
             saveHistory();
@@ -461,8 +652,8 @@ function App() {
           secondPage={secondPage}
           scale={scale}
           showGrid={showGrid}
-          selectedElementId={selectedElementId}
-          onSelectElement={setSelectedElementId}
+          selectedElementIds={selectedElementIds}
+          onSelectElements={setSelectedElementIds}
           onUpdateElement={handleUpdateElement}
           onRecordChange={saveHistory}
         />
@@ -470,27 +661,32 @@ function App() {
         {/* Right Properties Panel */}
         <PropertiesPanel 
           selectedElement={selectedElement}
+          selectedElementIds={selectedElementIds}
           activePage={activePage}
           onUpdateElement={handleUpdateElement}
           onUpdatePage={handleUpdatePage}
           onDeleteElement={handleDeleteElement}
+          onDeleteSelected={handleDeleteSelected}
           onDuplicateElement={handleDuplicateElement}
+          onGroup={handleGroup}
+          onUngroup={handleUngroup}
           onBringForward={(id) => handleLayerChange(id, 'front')}
           onSendBackward={(id) => handleLayerChange(id, 'back')}
           onRecordChange={saveHistory}
         />
       </div>
 
-      {/* Hidden Container for PDF Generation */}
-      {/* Position fixed far away to be rendered but not visible */}
+      {/* Hidden Container for PDF Generation - 고정 크기로 레이아웃 보장 */}
       <div 
         id="pdf-export-container"
         style={{ 
           position: 'fixed', 
           top: 0, 
           left: -10000,
+          width: PAGE_WIDTH,
+          minWidth: PAGE_WIDTH,
           display: 'flex',
-          flexDirection: 'column'
+          flexDirection: 'column',
         }}
       >
         {pages.map(page => (

@@ -1,5 +1,9 @@
 import { Page } from './types';
 
+/** A4 페이지 크기 (96 DPI: 794×1123) - 캔버스·PDF 출력 기본값 */
+export const PAGE_WIDTH = 794;
+export const PAGE_HEIGHT = 1123;
+
 export const INITIAL_PAGES: Page[] = [
   {
     id: 'p1',
@@ -53,7 +57,7 @@ export const INITIAL_PAGES: Page[] = [
         type: 'shape',
         x: 0,
         y: 700,
-        width: 595,
+        width: PAGE_WIDTH,
         height: 142,
         content: '',
         styles: {
@@ -101,7 +105,7 @@ export const INITIAL_PAGES: Page[] = [
          x: 0,
          y: 0,
          width: 80,
-         height: 842,
+         height: PAGE_HEIGHT,
          content: '',
          styles: {
             backgroundColor: '#e7926b'
