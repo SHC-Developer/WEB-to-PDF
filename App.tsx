@@ -20,9 +20,9 @@ function App() {
   const [history, setHistory] = useState<Page[][]>([]);
   const [future, setFuture] = useState<Page[][]>([]);
 
-  // Clipboard State
+  // Clipboard State (다중 선택 시 여러 개체, 그룹은 하나의 요소로 저장)
   const [clipboardPage, setClipboardPage] = useState<Page | null>(null);
-  const [clipboardElement, setClipboardElement] = useState<EditorElement | null>(null);
+  const [clipboardElements, setClipboardElements] = useState<EditorElement[]>([]);
 
   const [activePageIndex, setActivePageIndex] = useState(0);
   const [selectedElementIds, setSelectedElementIds] = useState<string[]>([]);
@@ -90,6 +90,17 @@ function App() {
       return newFuture;
     });
   }, [pages]);
+
+  /** 요소(및 그룹 자식)에 새 id 부여한 복제 */
+  const cloneElementWithNewIds = useCallback((el: EditorElement): EditorElement => {
+    const newId = `${el.type}-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+    const cloned = JSON.parse(JSON.stringify(el)) as EditorElement;
+    cloned.id = newId;
+    if (cloned.type === 'group' && cloned.groupChildren?.length) {
+      cloned.groupChildren = cloned.groupChildren.map(c => cloneElementWithNewIds(c));
+    }
+    return cloned;
+  }, []);
 
   // --- Element Management ---
 
@@ -250,25 +261,63 @@ function App() {
   const handleGroup = () => {
     if (selectedElementIds.length < 2) return;
     saveHistory();
-    const groupId = `group-${Date.now()}`;
-    setPages(prev => prev.map(page => ({
-      ...page,
-      elements: page.elements.map(el =>
-        selectedElementIds.includes(el.id) ? { ...el, groupId } : el
-      )
-    })));
+    const idSet = new Set(selectedElementIds);
+    const newGroupIds: string[] = [];
+    setPages(prev => prev.map(page => {
+      const selected = page.elements.filter(el => idSet.has(el.id));
+      if (selected.length < 2) return page;
+      const groupId = `group-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+      newGroupIds.push(groupId);
+      const minX = Math.min(...selected.map(el => el.x));
+      const minY = Math.min(...selected.map(el => el.y));
+      const maxX = Math.max(...selected.map(el => el.x + el.width));
+      const maxY = Math.max(...selected.map(el => el.y + el.height));
+      const groupChildren: EditorElement[] = selected.map(el => ({
+        ...JSON.parse(JSON.stringify(el)),
+        x: el.x - minX,
+        y: el.y - minY,
+        groupId: undefined,
+      }));
+      const groupElement: EditorElement = {
+        id: groupId,
+        type: 'group',
+        x: minX,
+        y: minY,
+        width: maxX - minX,
+        height: maxY - minY,
+        styles: {},
+        groupChildren,
+      };
+      const rest = page.elements.filter(el => !idSet.has(el.id));
+      return { ...page, elements: [...rest, groupElement] };
+    }));
+    setSelectedElementIds(newGroupIds);
   };
 
   const handleUngroup = () => {
     if (selectedElementIds.length === 0) return;
     saveHistory();
-    const ids = new Set(selectedElementIds);
-    setPages(prev => prev.map(page => ({
-      ...page,
-      elements: page.elements.map(el =>
-        ids.has(el.id) ? { ...el, groupId: undefined } : el
-      )
-    })));
+    const idSet = new Set(selectedElementIds);
+    setPages(prev => prev.map(page => {
+      const newElements: EditorElement[] = [];
+      for (const el of page.elements) {
+        if (!idSet.has(el.id)) {
+          newElements.push(el);
+          continue;
+        }
+        if (el.type === 'group' && el.groupChildren?.length) {
+          for (const child of el.groupChildren) {
+            newElements.push({
+              ...child,
+              x: el.x + child.x,
+              y: el.y + child.y,
+            });
+          }
+        }
+      }
+      return { ...page, elements: newElements };
+    }));
+    setSelectedElementIds([]);
   };
 
   const handleLayerChange = (id: string, direction: 'front' | 'back') => {
@@ -438,7 +487,6 @@ function App() {
     try {
       if (projectFileHandleRef.current) {
         await writeToHandle(projectFileHandleRef.current);
-        alert(`전체 ${pages.length}개 페이지가 저장되었습니다.`);
         return;
       }
 
@@ -449,7 +497,6 @@ function App() {
         });
         projectFileHandleRef.current = handle;
         await writeToHandle(handle);
-        alert(`전체 ${pages.length}개 페이지가 저장되었습니다.\n같은 파일에 Ctrl+S로 덮어쓸 수 있습니다.`);
         return;
       }
 
@@ -460,7 +507,6 @@ function App() {
       a.download = `project-${new Date().toISOString().slice(0, 10)}-${Date.now()}.json`;
       a.click();
       URL.revokeObjectURL(url);
-      alert(`전체 ${pages.length}개 페이지가 저장되었습니다.\n파일에서 불러오기로 복원할 수 있습니다.`);
     } catch (err) {
       if ((err as { name?: string })?.name === 'AbortError') return;
       console.error(err);
@@ -475,40 +521,41 @@ function App() {
       // Skip if editing input
       const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
 
-      // Copy (Ctrl+C / Cmd+C)
+      // Copy (Ctrl+C / Cmd+C) — 다중 선택 시 모두 복사, 그룹은 하나의 요소로 복사
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
         if (!isInput) {
           e.preventDefault();
-          const el = visiblePages.flatMap(p => p.elements).find(e => e.id === selectedElementId);
-          if (selectedElementId && el) {
-            setClipboardElement(JSON.parse(JSON.stringify(el)));
+          if (selectedElementIds.length > 0) {
+            const elements = selectedElementIds
+              .map(id => visiblePages.flatMap(p => p.elements).find(el => el.id === id))
+              .filter((el): el is EditorElement => el != null);
+            setClipboardElements(elements.map(el => JSON.parse(JSON.stringify(el))));
+            setClipboardPage(null);
           } else {
             setClipboardPage(pages[activePageIndex]);
+            setClipboardElements([]);
           }
         }
       }
 
-      // Paste (Ctrl+V / Cmd+V)
+      // Paste (Ctrl+V / Cmd+V) — 복사된 여러 개체/그룹 모두 붙여넣기
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') {
         if (!isInput) {
           e.preventDefault();
-          if (clipboardElement) {
+          if (clipboardElements.length > 0) {
             saveHistory();
-            const newId = `${clipboardElement.type}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-            const pasted: EditorElement = {
-              ...JSON.parse(JSON.stringify(clipboardElement)),
-              id: newId,
-              x: clipboardElement.x + 20,
-              y: clipboardElement.y + 20,
-            };
+            const pasted = clipboardElements.map(el => {
+              const cloned = cloneElementWithNewIds(el);
+              return { ...cloned, x: cloned.x + 20, y: cloned.y + 20 };
+            });
             const nextPages = pages.map((p, i) =>
               i === activePageIndex
-                ? { ...p, elements: [...p.elements, pasted] }
+                ? { ...p, elements: [...p.elements, ...pasted] }
                 : p
             );
             setPages(nextPages);
-            setSelectedElementIds([newId]);
-          } else if (!selectedElementId && clipboardPage) {
+            setSelectedElementIds(pasted.map(el => el.id));
+          } else if (selectedElementIds.length === 0 && clipboardPage) {
              saveHistory();
              const newPage: Page = {
                ...JSON.parse(JSON.stringify(clipboardPage)),
@@ -600,7 +647,7 @@ function App() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedElementIds, undo, redo, handleDeleteSelected, handleUpdateElement, handleUpdateElements, handleDeleteElement, handleSaveProject, pages, activePageIndex, clipboardPage, clipboardElement, visiblePages, saveHistory]);
+  }, [selectedElementIds, undo, redo, handleDeleteSelected, handleUpdateElement, handleUpdateElements, handleDeleteElement, handleSaveProject, pages, activePageIndex, clipboardPage, clipboardElements, visiblePages, saveHistory, cloneElementWithNewIds]);
 
 
   return (

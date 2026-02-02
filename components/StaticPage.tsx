@@ -6,10 +6,83 @@ interface StaticPageProps {
   page: Page;
 }
 
+const renderElementContent = (el: EditorElement) => (
+  <div
+    className={`w-full h-full ${el.type === 'text' ? '' : 'overflow-hidden'}`}
+    style={{
+      ...el.styles,
+      display: el.type === 'text' ? 'flex' : undefined,
+      alignItems: el.type === 'text' ? (el.styles.alignItems || 'center') : undefined,
+    }}
+  >
+    {el.type === 'text' && (
+      <div className="w-full break-words whitespace-pre-wrap" style={{ cursor: 'text' }}>
+        {el.content}
+      </div>
+    )}
+    {el.type === 'image' && (
+      <div
+        className="w-full h-full"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden',
+        }}
+      >
+        <img
+          src={el.content}
+          alt=""
+          crossOrigin="anonymous"
+          style={{
+            maxWidth: '100%',
+            maxHeight: '100%',
+            width: 'auto',
+            height: 'auto',
+          }}
+        />
+      </div>
+    )}
+    {el.type === 'shape' && <div className="w-full h-full" />}
+  </div>
+);
+
 // A simplified version of Canvas that renders elements for PDF generation
 // No event handlers, selection outlines, or resize handles.
 export const StaticPage: React.FC<StaticPageProps> = ({ page }) => {
   const renderElement = (element: EditorElement) => {
+    if (element.type === 'group') {
+      return (
+        <div
+          key={element.id}
+          style={{
+            position: 'absolute',
+            left: element.x,
+            top: element.y,
+            width: element.width,
+            height: element.height,
+            zIndex: element.styles.zIndex,
+          }}
+        >
+          <div className="w-full h-full relative overflow-hidden">
+            {element.groupChildren?.map((child) => (
+              <div
+                key={child.id}
+                style={{
+                  position: 'absolute',
+                  left: child.x,
+                  top: child.y,
+                  width: child.width,
+                  height: child.height,
+                }}
+              >
+                {renderElementContent(child)}
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
     return (
       <div
         key={element.id}
@@ -23,48 +96,7 @@ export const StaticPage: React.FC<StaticPageProps> = ({ page }) => {
           zIndex: element.styles.zIndex
         }}
       >
-        <div 
-          className={`w-full h-full ${element.type === 'text' ? '' : 'overflow-hidden'}`}
-          style={{
-            ...element.styles,
-            display: element.type === 'text' ? 'flex' : undefined,
-            alignItems: element.type === 'text' ? (element.styles.alignItems || 'center') : undefined,
-          }}
-        >
-           {element.type === 'text' && (
-             <div className="w-full break-words whitespace-pre-wrap" style={{ cursor: 'text' }}>
-               {element.content}
-             </div>
-           )}
-
-           {element.type === 'image' && (
-             <div
-               className="w-full h-full"
-               style={{
-                 display: 'flex',
-                 alignItems: 'center',
-                 justifyContent: 'center',
-                 overflow: 'hidden',
-               }}
-             >
-               <img
-                 src={element.content}
-                 alt=""
-                 crossOrigin="anonymous"
-                 style={{
-                   maxWidth: '100%',
-                   maxHeight: '100%',
-                   width: 'auto',
-                   height: 'auto',
-                 }}
-               />
-             </div>
-           )}
-
-           {element.type === 'shape' && (
-             <div className="w-full h-full"></div>
-           )}
-        </div>
+        {renderElementContent(element)}
       </div>
     );
   };

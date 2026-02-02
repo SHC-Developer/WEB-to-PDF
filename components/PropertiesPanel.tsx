@@ -108,7 +108,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   return (
     <div className="w-[300px] bg-white border-l border-gray-200 flex flex-col h-full shrink-0 overflow-y-auto">
       <div className="p-4 border-b border-gray-200 sticky top-0 bg-white z-10 flex justify-between items-center">
-        <span className="text-sm font-bold text-gray-800 capitalize">{selectedElement.type} 속성</span>
+        <span className="text-sm font-bold text-gray-800 capitalize">{selectedElement.type === 'group' ? '그룹' : selectedElement.type} 속성</span>
         <div className="flex gap-1">
            <button onClick={() => { record(); onUpdateElement(selectedElement.id, { locked: !selectedElement.locked }); }} className={`p-1.5 rounded hover:bg-gray-100 ${selectedElement.locked ? 'text-red-500 bg-red-50' : 'text-gray-500'}`} title="잠금/해제">
               {selectedElement.locked ? <Icons.Lock size={16} /> : <Icons.Unlock size={16} />}
@@ -123,7 +123,21 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
       </div>
 
       <div className="p-4 space-y-6">
-        
+
+        {/* 그룹 선택 시: 그룹 해제 버튼 */}
+        {selectedElement.type === 'group' && (
+          <div className="space-y-2">
+            <div className="text-xs font-bold text-gray-700">그룹</div>
+            <p className="text-xs text-gray-500">그룹 해제 시 포함된 개체들이 각각 분리됩니다.</p>
+            <button
+              onClick={() => { record(); onUngroup(); }}
+              className="w-full px-3 py-2 rounded border border-gray-200 text-sm hover:bg-gray-50"
+            >
+              그룹 해제
+            </button>
+          </div>
+        )}
+
         {/* Layout & Position */}
         <div className="space-y-3">
           <div className="text-xs font-bold text-gray-700">정렬 및 배치</div>

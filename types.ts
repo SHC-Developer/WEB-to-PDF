@@ -1,9 +1,9 @@
-export type ElementType = 'text' | 'image' | 'shape' | 'video';
+export type ElementType = 'text' | 'image' | 'shape' | 'video' | 'group';
 
 export interface EditorElement {
   id: string;
   type: ElementType;
-  content?: string; // Text content or Image URL
+  content?: string; // Text content or Image URL (group에는 없음)
   x: number;
   y: number;
   width: number;
@@ -11,6 +11,8 @@ export interface EditorElement {
   rotation?: number;
   locked?: boolean;
   groupId?: string;
+  /** type === 'group' 일 때만: 자식 요소들 (x,y는 그룹 기준 상대 좌표) */
+  groupChildren?: EditorElement[];
   styles: {
     backgroundColor?: string;
     color?: string;

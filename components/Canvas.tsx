@@ -41,6 +41,7 @@ export const Canvas: React.FC<CanvasProps> = ({
 
   // Marquee selection (PPT-style box select)
   const [marquee, setMarquee] = useState<{ pageId: string; startX: number; startY: number; endX: number; endY: number } | null>(null);
+  const marqueeJustFinishedRef = useRef(false);
 
   const canvasRef = useRef<HTMLDivElement>(null);
 
@@ -190,7 +191,20 @@ export const Canvas: React.FC<CanvasProps> = ({
         }
 
         if (newWidth > 10 && newHeight > 10) {
-          onUpdateElement(element.id, { x: newX, y: newY, width: newWidth, height: newHeight });
+          if (element.type === 'group' && element.groupChildren?.length) {
+            const scaleX = newWidth / startWidth;
+            const scaleY = newHeight / startHeight;
+            const scaledChildren = element.groupChildren.map(c => ({
+              ...c,
+              x: c.x * scaleX,
+              y: c.y * scaleY,
+              width: c.width * scaleX,
+              height: c.height * scaleY,
+            }));
+            onUpdateElement(element.id, { x: newX, y: newY, width: newWidth, height: newHeight, groupChildren: scaledChildren });
+          } else {
+            onUpdateElement(element.id, { x: newX, y: newY, width: newWidth, height: newHeight });
+          }
         }
       };
 
@@ -327,10 +341,121 @@ export const Canvas: React.FC<CanvasProps> = ({
     }
   };
 
+  const renderElementContent = (el: EditorElement, options: { isGroupChild?: boolean; canEdit?: boolean } = {}) => {
+    const { isGroupChild, canEdit } = options;
+    return (
+      <div
+        className={`w-full h-full ${el.type === 'text' ? '' : 'overflow-hidden'}`}
+        style={{ ...el.styles }}
+      >
+        {el.type === 'text' && (
+          <div
+            className="w-full h-full break-words whitespace-pre-wrap outline-none"
+            contentEditable={!isGroupChild && canEdit}
+            suppressContentEditableWarning
+            onMouseDown={(e) => {
+              if (!isGroupChild && canEdit) e.stopPropagation();
+            }}
+            onFocus={() => onRecordChange()}
+            onBlur={(e) => onUpdateElement(el.id, { content: e.currentTarget.innerText })}
+            style={{
+              cursor: 'text',
+              display: 'flex',
+              alignItems: el.styles.alignItems || 'center',
+              pointerEvents: !isGroupChild && canEdit ? 'auto' : 'none',
+              width: '100%',
+            }}
+          >
+            <span className="break-words whitespace-pre-wrap" style={{ width: '100%', display: 'block', textAlign: el.styles.textAlign || 'left' }}>
+              {el.content}
+            </span>
+          </div>
+        )}
+        {el.type === 'image' && (
+          <img
+            src={el.content}
+            alt=""
+            className="w-full h-full pointer-events-none"
+            style={{ objectFit: el.styles.objectFit ?? 'contain' }}
+          />
+        )}
+        {el.type === 'shape' && (
+          <div className="w-full h-full flex items-center justify-center pointer-events-none" />
+        )}
+      </div>
+    );
+  };
+
   const renderElement = (element: EditorElement, pageId: string) => {
     const isSelected = selectedElementIds.includes(element.id);
     const isBeingDragged = draggingElementId === element.id;
     const blockPointerDuringDrag = (isDragging || isResizing || isRotating) && !isBeingDragged;
+    const canEdit = isSelected && selectedElementIds.length === 1 && !element.locked && !isDragging;
+
+    if (element.type === 'group') {
+      return (
+        <div
+          key={element.id}
+          className={`absolute group element-wrapper ${isSelected ? 'z-50' : ''}`}
+          style={{
+            left: element.x,
+            top: element.y,
+            width: element.width,
+            height: element.height,
+            cursor: element.locked ? 'default' : 'move',
+            zIndex: element.styles.zIndex,
+            pointerEvents: blockPointerDuringDrag ? 'none' : undefined,
+          }}
+          onMouseDown={(e) => handleMouseDown(e, element, pageId)}
+        >
+          <div className="w-full h-full relative overflow-hidden">
+            {element.groupChildren?.map((child) => (
+              <div
+                key={child.id}
+                className="absolute pointer-events-none"
+                style={{ left: child.x, top: child.y, width: child.width, height: child.height }}
+              >
+                {renderElementContent(child, { isGroupChild: true })}
+              </div>
+            ))}
+          </div>
+          {isSelected && (
+            <div className={`absolute -inset-0.5 border pointer-events-none ${element.locked ? 'border-red-400' : 'border-blue-500'}`} />
+          )}
+          {element.locked && isSelected && (
+            <div className="absolute top-2 right-2 text-red-500 bg-white rounded-full p-1 shadow z-50">
+              <Icons.Lock size={12} />
+            </div>
+          )}
+          {isSelected && selectedElementIds.length === 1 && !element.locked && (
+            <>
+              <div
+                className="absolute -top-8 left-1/2 -translate-x-1/2 w-6 h-6 bg-white border border-gray-300 rounded-full flex items-center justify-center cursor-grab active:cursor-grabbing shadow-sm hover:text-blue-500"
+                onMouseDown={(e) => handleMouseDown(e, element, pageId, 'rotate')}
+              >
+                <Icons.Rotate size={12} />
+              </div>
+              {['nw', 'n', 'ne', 'w', 'e', 'sw', 's', 'se'].map((dir) => (
+                <div
+                  key={dir}
+                  className={`absolute w-2.5 h-2.5 bg-white border border-blue-500 rounded-sm z-50
+                    ${dir === 'n' || dir === 's' ? 'cursor-ns-resize' : ''}
+                    ${dir === 'e' || dir === 'w' ? 'cursor-ew-resize' : ''}
+                    ${dir === 'nw' || dir === 'se' ? 'cursor-nwse-resize' : ''}
+                    ${dir === 'ne' || dir === 'sw' ? 'cursor-nesw-resize' : ''}
+                  `}
+                  style={{
+                    top: dir.includes('n') ? '-5px' : dir.includes('s') ? 'calc(100% - 5px)' : 'calc(50% - 5px)',
+                    left: dir.includes('w') ? '-5px' : dir.includes('e') ? 'calc(100% - 5px)' : 'calc(50% - 5px)',
+                  }}
+                  onMouseDown={(e) => handleMouseDown(e, element, pageId, dir)}
+                />
+              ))}
+            </>
+          )}
+        </div>
+      );
+    }
 
     return (
       <div
@@ -348,47 +473,7 @@ export const Canvas: React.FC<CanvasProps> = ({
         }}
         onMouseDown={(e) => handleMouseDown(e, element, pageId)}
       >
-        {/* Content */}
-        <div 
-          className={`w-full h-full ${element.type === 'text' ? '' : 'overflow-hidden'}`}
-          style={{
-            ...element.styles,
-          }}
-        >
-           {element.type === 'text' && (
-             <div className="w-full h-full break-words whitespace-pre-wrap outline-none" 
-                contentEditable={isSelected && selectedElementIds.length === 1 && !element.locked}
-                suppressContentEditableWarning
-                onFocus={() => onRecordChange()}
-                onBlur={(e) => onUpdateElement(element.id, { content: e.currentTarget.innerText })}
-                style={{ 
-                   cursor: 'text',
-                   display: 'flex',
-                   alignItems: element.styles.alignItems || 'center',
-                   pointerEvents: isSelected && selectedElementIds.length === 1 && !isDragging ? 'auto' : 'none',
-                   width: '100%'
-                }}
-             >
-               <span className="break-words whitespace-pre-wrap" style={{ width: '100%', display: 'block', textAlign: element.styles.textAlign || 'left' }}>
-                 {element.content}
-               </span>
-             </div>
-           )}
-
-           {element.type === 'image' && (
-             <img
-               src={element.content}
-               alt=""
-               className="w-full h-full pointer-events-none"
-               style={{ objectFit: element.styles.objectFit ?? 'contain' }}
-             />
-           )}
-
-           {element.type === 'shape' && (
-             <div className="w-full h-full flex items-center justify-center pointer-events-none">
-             </div>
-           )}
-        </div>
+        {renderElementContent(element, { canEdit })}
 
         {/* Selection Border - Always show if selected */}
         {isSelected && (
@@ -488,7 +573,10 @@ export const Canvas: React.FC<CanvasProps> = ({
           const elBottom = elTop + el.height;
           return !(elLeft > right || elRight < left || elTop > bottom || elBottom < top);
         }).map(el => el.id);
-        if (ids.length > 0) onSelectElements(ids);
+        if (ids.length > 0) {
+          marqueeJustFinishedRef.current = true;
+          onSelectElements(ids);
+        }
         return null;
       });
     };
@@ -496,10 +584,18 @@ export const Canvas: React.FC<CanvasProps> = ({
     document.addEventListener('mouseup', onUp);
   };
 
+  const handleCanvasClick = () => {
+    if (marqueeJustFinishedRef.current) {
+      marqueeJustFinishedRef.current = false;
+      return;
+    }
+    onSelectElements([]);
+  };
+
   return (
     <div 
       className="flex-1 bg-gray-200 overflow-auto flex items-start justify-center p-12 relative"
-      onClick={() => onSelectElements([])}
+      onClick={handleCanvasClick}
       ref={canvasRef}
     >
       <div className={`flex gap-1 transition-transform duration-200 ease-out`} style={{ transform: `scale(${scale})` }}>
