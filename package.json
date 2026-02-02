@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "export-templates": "npx tsx scripts/export-catalog.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.563.0",

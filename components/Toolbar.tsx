@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { Icons } from './Icons';
 
 interface ToolbarProps {
@@ -12,7 +12,14 @@ interface ToolbarProps {
   onRedo: () => void;
   onSave: () => void;
   isSaving?: boolean;
+  onLoadBuiltInTemplate?: (templateId: string) => void;
+  onLoadTemplateFromFile?: (file: File) => void;
 }
+
+const BUILT_IN_TEMPLATES = [
+  { id: 'default', label: '기본 (PET Hospital)' },
+  { id: 'catalog', label: 'Catalog (특허 카탈로그)' },
+] as const;
 
 export const Toolbar: React.FC<ToolbarProps> = ({
   showGrid, setShowGrid,
@@ -20,8 +27,21 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   scale, setScale,
   onUndo, onRedo,
   onSave,
-  isSaving = false
+  isSaving = false,
+  onLoadBuiltInTemplate,
+  onLoadTemplateFromFile,
 }) => {
+  const [templateMenuOpen, setTemplateMenuOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && onLoadTemplateFromFile) {
+      onLoadTemplateFromFile(file);
+    }
+    e.target.value = '';
+  };
+
   return (
     <div className="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-4 shrink-0 shadow-sm z-10">
       <div className="flex items-center gap-4">
@@ -38,6 +58,57 @@ export const Toolbar: React.FC<ToolbarProps> = ({
            <button onClick={onRedo} className="p-2 text-gray-500 hover:bg-gray-100 rounded transition-colors" title="다시 실행">
              <Icons.Redo size={18} />
            </button>
+        </div>
+
+        <div className="h-6 w-px bg-gray-300 mx-2"></div>
+
+        {/* 템플릿 불러오기 */}
+        <div className="relative">
+          <button
+            onClick={() => setTemplateMenuOpen(!templateMenuOpen)}
+            className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded transition-colors"
+            title="템플릿 불러오기"
+          >
+            <Icons.Template size={18} />
+            <span>템플릿</span>
+          </button>
+          {templateMenuOpen && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setTemplateMenuOpen(false)} />
+              <div className="absolute left-0 top-full mt-1 py-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-[200px]">
+                {BUILT_IN_TEMPLATES.map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => {
+                      onLoadBuiltInTemplate?.(t.id);
+                      setTemplateMenuOpen(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    {t.label}
+                  </button>
+                ))}
+                <div className="border-t border-gray-100 my-1" />
+                <button
+                  onClick={() => {
+                    fileInputRef.current?.click();
+                    setTemplateMenuOpen(false);
+                  }}
+                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                >
+                  <Icons.Upload size={16} />
+                  파일에서 불러오기 (.json)
+                </button>
+              </div>
+            </>
+          )}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json,application/json"
+            onChange={handleFileSelect}
+            className="hidden"
+          />
         </div>
       </div>
 

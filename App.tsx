@@ -6,6 +6,7 @@ import { Canvas } from './components/Canvas';
 import { PropertiesPanel } from './components/PropertiesPanel';
 import { StaticPage } from './components/StaticPage';
 import { INITIAL_PAGES } from './constants';
+import { CATALOG_PAGES } from './Templates/catalog/catalog';
 import { Page, EditorElement } from './types';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
@@ -255,6 +256,45 @@ function App() {
     }
   };
 
+  // --- Template Loading ---
+  const handleLoadBuiltInTemplate = useCallback((templateId: string) => {
+    if (templateId === 'catalog') {
+      setPages(JSON.parse(JSON.stringify(CATALOG_PAGES)));
+    } else {
+      setPages(JSON.parse(JSON.stringify(INITIAL_PAGES)));
+    }
+    setHistory([]);
+    setFuture([]);
+    setActivePageIndex(0);
+    setSelectedElementId(null);
+  }, []);
+
+  const handleLoadTemplateFromFile = useCallback((file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const text = e.target?.result as string;
+        const data = JSON.parse(text);
+        if (!Array.isArray(data)) {
+          throw new Error('유효한 Page 배열이 아닙니다.');
+        }
+        const pages = data as Page[];
+        if (pages.some(p => !p.id || !p.title || !Array.isArray(p.elements))) {
+          throw new Error('Page 형식이 올바르지 않습니다.');
+        }
+        setPages(pages);
+        setHistory([]);
+        setFuture([]);
+        setActivePageIndex(0);
+        setSelectedElementId(null);
+      } catch (err) {
+        console.error('Template load error:', err);
+        alert('템플릿 파일을 불러올 수 없습니다. 형식이 올바른 JSON(Page[])인지 확인해주세요.');
+      }
+    };
+    reader.readAsText(file);
+  }, []);
+
   // --- PDF Export ---
   const handleSave = async () => {
     try {
@@ -382,6 +422,8 @@ function App() {
         onUndo={undo} onRedo={redo}
         onSave={handleSave}
         isSaving={isSaving}
+        onLoadBuiltInTemplate={handleLoadBuiltInTemplate}
+        onLoadTemplateFromFile={handleLoadTemplateFromFile}
       />
       
       <div className="flex flex-1 overflow-hidden relative">

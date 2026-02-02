@@ -25,9 +25,14 @@ export interface EditorElement {
     opacity?: number;
     zIndex?: number;
     border?: string;
+    borderBottom?: string;
+    borderTopLeftRadius?: number;
+    borderTopRightRadius?: number;
     borderWidth?: number;
     borderColor?: string;
     borderStyle?: string;
+    objectFit?: 'cover' | 'contain' | 'fill' | 'none';
+    alignItems?: 'flex-start' | 'center' | 'flex-end';
   };
 }
 

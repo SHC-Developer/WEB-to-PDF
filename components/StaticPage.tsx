@@ -27,7 +27,7 @@ export const StaticPage: React.FC<StaticPageProps> = ({ page }) => {
           style={{
             ...element.styles,
             display: element.type === 'text' ? 'flex' : undefined,
-            alignItems: element.type === 'text' ? 'center' : undefined,
+            alignItems: element.type === 'text' ? (element.styles.alignItems || 'center') : undefined,
           }}
         >
            {element.type === 'text' && (
@@ -40,7 +40,8 @@ export const StaticPage: React.FC<StaticPageProps> = ({ page }) => {
              <img 
                src={element.content} 
                alt="" 
-               className="w-full h-full object-cover" 
+               className="w-full h-full"
+               style={{ objectFit: element.styles.objectFit || 'cover' }}
                crossOrigin="anonymous" // Important for html2canvas
              />
            )}
