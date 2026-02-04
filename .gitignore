@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# 대용량 PDF (GitHub 100MB 제한) - Templates 출력물은 추적하지 않음
+Templates/**/*.pdf

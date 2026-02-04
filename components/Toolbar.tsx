@@ -20,8 +20,6 @@ interface ToolbarProps {
 
 const BUILT_IN_TEMPLATES = [
   { id: 'default', label: '기본 (PET Hospital)' },
-  { id: 'catalog', label: 'Catalog (특허 카탈로그)' },
-  { id: 'catalog-renewal', label: 'Catalog 리뉴얼 (특허 카탈로그)' },
 ] as const;
 
 export const Toolbar: React.FC<ToolbarProps> = ({

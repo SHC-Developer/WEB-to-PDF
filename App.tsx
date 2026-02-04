@@ -6,8 +6,6 @@ import { Canvas } from './components/Canvas';
 import { PropertiesPanel } from './components/PropertiesPanel';
 import { StaticPage } from './components/StaticPage';
 import { INITIAL_PAGES, PAGE_WIDTH, PAGE_HEIGHT } from './constants';
-import { CATALOG_PAGES } from './Templates/catalog/catalog';
-import { RENEWAL_CATALOG_PAGES } from './Templates/catalog/catalog-renewal';
 import { Page, EditorElement } from './types';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
@@ -377,13 +375,9 @@ function App() {
     }
   };
 
-  // --- Template Loading ---
+  // --- Template Loading (기본만 내장, 나머지는 JSON 파일로만 불러오기) ---
   const handleLoadBuiltInTemplate = useCallback((templateId: string) => {
-    if (templateId === 'catalog') {
-      setPages(JSON.parse(JSON.stringify(CATALOG_PAGES)));
-    } else if (templateId === 'catalog-renewal') {
-      setPages(JSON.parse(JSON.stringify(RENEWAL_CATALOG_PAGES)));
-    } else {
+    if (templateId === 'default') {
       setPages(JSON.parse(JSON.stringify(INITIAL_PAGES)));
     }
     setHistory([]);

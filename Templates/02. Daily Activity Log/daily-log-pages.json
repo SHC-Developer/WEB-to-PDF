@@ -1,0 +1,216 @@
+[
+  {
+    "id": "daily-cover",
+    "title": "Cover",
+    "backgroundColor": "#f8fafc",
+    "elements": [
+      {
+        "id": "d1-title",
+        "type": "text",
+        "x": 80,
+        "y": 380,
+        "width": 634,
+        "height": 56,
+        "content": "업무 일지",
+        "styles": {
+          "fontSize": 42,
+          "fontWeight": "bold",
+          "color": "#1e293b",
+          "textAlign": "center"
+        }
+      },
+      {
+        "id": "d1-sub",
+        "type": "text",
+        "x": 80,
+        "y": 450,
+        "width": 634,
+        "height": 24,
+        "content": "작성자 · 부서 · 기간을 입력하세요",
+        "styles": {
+          "fontSize": 14,
+          "color": "#64748b",
+          "textAlign": "center"
+        }
+      }
+    ]
+  },
+  {
+    "id": "daily-page1",
+    "title": "업무 일지",
+    "backgroundColor": "#ffffff",
+    "contentArea": {
+      "margin": 60,
+      "backgroundColor": "#f8fafc"
+    },
+    "elements": [
+      {
+        "id": "d2-date",
+        "type": "text",
+        "x": 120,
+        "y": 100,
+        "width": 200,
+        "height": 28,
+        "content": "날짜: 2026-02-04 (수)",
+        "styles": {
+          "fontSize": 16,
+          "fontWeight": 600,
+          "color": "#1e293b"
+        }
+      },
+      {
+        "id": "d2-time",
+        "type": "text",
+        "x": 120,
+        "y": 150,
+        "width": 120,
+        "height": 22,
+        "content": "시간",
+        "styles": {
+          "fontSize": 12,
+          "fontWeight": 600,
+          "color": "#475569"
+        }
+      },
+      {
+        "id": "d2-desc",
+        "type": "text",
+        "x": 260,
+        "y": 150,
+        "width": 320,
+        "height": 22,
+        "content": "업무 내용",
+        "styles": {
+          "fontSize": 12,
+          "fontWeight": 600,
+          "color": "#475569"
+        }
+      },
+      {
+        "id": "d2-cat",
+        "type": "text",
+        "x": 600,
+        "y": 150,
+        "width": 80,
+        "height": 22,
+        "content": "구분",
+        "styles": {
+          "fontSize": 12,
+          "fontWeight": 600,
+          "color": "#475569"
+        }
+      },
+      {
+        "id": "d2-row1",
+        "type": "text",
+        "x": 120,
+        "y": 190,
+        "width": 554,
+        "height": 40,
+        "content": "09:00-10:00  \n(작성)",
+        "styles": {
+          "fontSize": 13,
+          "color": "#334155",
+          "lineHeight": 1.5
+        }
+      },
+      {
+        "id": "d2-row2",
+        "type": "text",
+        "x": 120,
+        "y": 250,
+        "width": 554,
+        "height": 40,
+        "content": "10:00-11:00  \n(작성)",
+        "styles": {
+          "fontSize": 13,
+          "color": "#334155",
+          "lineHeight": 1.5
+        }
+      },
+      {
+        "id": "d2-row3",
+        "type": "text",
+        "x": 120,
+        "y": 310,
+        "width": 554,
+        "height": 40,
+        "content": "14:00-15:00  \n(작성)",
+        "styles": {
+          "fontSize": 13,
+          "color": "#334155",
+          "lineHeight": 1.5
+        }
+      },
+      {
+        "id": "d2-summary",
+        "type": "text",
+        "x": 120,
+        "y": 400,
+        "width": 554,
+        "height": 24,
+        "content": "요약:",
+        "styles": {
+          "fontSize": 12,
+          "fontWeight": 600,
+          "color": "#475569"
+        }
+      },
+      {
+        "id": "d2-summary-val",
+        "type": "text",
+        "x": 120,
+        "y": 430,
+        "width": 554,
+        "height": 60,
+        "content": "(해당일 요약)",
+        "styles": {
+          "fontSize": 13,
+          "color": "#334155",
+          "lineHeight": 1.5
+        }
+      },
+      {
+        "id": "d2-notes",
+        "type": "text",
+        "x": 120,
+        "y": 520,
+        "width": 554,
+        "height": 24,
+        "content": "비고:",
+        "styles": {
+          "fontSize": 12,
+          "fontWeight": 600,
+          "color": "#475569"
+        }
+      },
+      {
+        "id": "d2-notes-val",
+        "type": "text",
+        "x": 120,
+        "y": 550,
+        "width": 554,
+        "height": 40,
+        "content": "(비고)",
+        "styles": {
+          "fontSize": 13,
+          "color": "#334155"
+        }
+      },
+      {
+        "id": "d2-hours",
+        "type": "text",
+        "x": 120,
+        "y": 620,
+        "width": 200,
+        "height": 24,
+        "content": "근무 시간:",
+        "styles": {
+          "fontSize": 12,
+          "fontWeight": 600,
+          "color": "#475569"
+        }
+      }
+    ]
+  }
+]

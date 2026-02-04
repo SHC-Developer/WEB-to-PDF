@@ -1,0 +1,39 @@
+{
+  "metadata": {
+    "title": "업무 일지",
+    "author": "",
+    "department": "",
+    "period": {
+      "start": "",
+      "end": ""
+    }
+  },
+  "entries": [
+    {
+      "date": "2026-02-04",
+      "dayOfWeek": "수",
+      "tasks": [
+        {
+          "time": "09:00-10:00",
+          "description": "",
+          "category": "업무"
+        },
+        {
+          "time": "10:00-11:00",
+          "description": "",
+          "category": "업무"
+        },
+        {
+          "time": "14:00-15:00",
+          "description": "",
+          "category": "업무"
+        }
+      ],
+      "summary": "",
+      "notes": "",
+      "hoursWorked": ""
+    }
+  ],
+  "_categories": ["업무", "회의", "교육", "외부", "기타"],
+  "_usage": "entries에 날짜별 항목을 추가하고, tasks에 시간대별 업무 내용을 작성하세요. category는 _categories 중에서 선택합니다."
+}
