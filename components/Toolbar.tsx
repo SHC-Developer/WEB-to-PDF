@@ -10,7 +10,8 @@ interface ToolbarProps {
   setScale: (scale: number) => void;
   onUndo: () => void;
   onRedo: () => void;
-  onSave: () => void;
+  onSaveNormalQuality?: () => void;
+  onSaveHighQuality?: () => void;
   onSaveProject?: () => void;
   isSaving?: boolean;
   onLoadBuiltInTemplate?: (templateId: string) => void;
@@ -28,7 +29,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   isDoublePage, setIsDoublePage,
   scale, setScale,
   onUndo, onRedo,
-  onSave,
+  onSaveNormalQuality,
+  onSaveHighQuality,
   onSaveProject,
   isSaving = false,
   onLoadBuiltInTemplate,
@@ -149,16 +151,30 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             프로젝트 저장
           </button>
         )}
-        <button 
-          onClick={onSave}
-          disabled={isSaving}
-          className={`px-5 py-2 rounded font-medium text-sm transition-colors shadow-sm flex items-center gap-2
-            ${isSaving ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#0091ff] hover:bg-[#007acc] text-white'}
-          `}
-          title="PDF로 저장"
-        >
-          {isSaving ? '저장 중...' : 'PDF 저장'}
-        </button>
+        {onSaveNormalQuality && (
+          <button
+            onClick={onSaveNormalQuality}
+            disabled={isSaving}
+            className={`px-4 py-2 rounded font-medium text-sm border transition-colors flex items-center gap-2
+              ${isSaving ? 'bg-gray-200 border-gray-200 cursor-not-allowed text-gray-500' : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'}
+            `}
+            title="PDF 일반화질 저장 (scale 3, JPEG)"
+          >
+            {isSaving ? '저장 중...' : '일반화질 저장'}
+          </button>
+        )}
+        {onSaveHighQuality && (
+          <button
+            onClick={onSaveHighQuality}
+            disabled={isSaving}
+            className={`px-5 py-2 rounded font-medium text-sm transition-colors shadow-sm flex items-center gap-2
+              ${isSaving ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#0091ff] hover:bg-[#007acc] text-white'}
+            `}
+            title="PDF 고화질 저장 (scale 4, PNG 무손실)"
+          >
+            {isSaving ? '저장 중...' : '고화질 저장'}
+          </button>
+        )}
       </div>
     </div>
   );

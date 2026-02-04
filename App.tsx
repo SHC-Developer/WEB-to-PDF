@@ -23,6 +23,8 @@ function App() {
   // Clipboard State (다중 선택 시 여러 개체, 그룹은 하나의 요소로 저장)
   const [clipboardPage, setClipboardPage] = useState<Page | null>(null);
   const [clipboardElements, setClipboardElements] = useState<EditorElement[]>([]);
+  /** 복사한 요소들이 있던 페이지 인덱스 (다른 페이지에 붙여넣을 때 동일 위치 유지용) */
+  const [clipboardSourcePageIndex, setClipboardSourcePageIndex] = useState<number | null>(null);
 
   const [activePageIndex, setActivePageIndex] = useState(0);
   const [selectedElementIds, setSelectedElementIds] = useState<string[]>([]);
@@ -416,55 +418,64 @@ function App() {
     reader.readAsText(file);
   }, []);
 
-  // --- PDF Export ---
-  const handleSave = async () => {
+  // --- PDF Export (공통: scale/포맷 옵션) ---
+  const savePdfWithOptions = async (options: { scale: number; format: 'jpeg' | 'png'; jpegQuality?: number }) => {
+    const { scale: captureScale, format, jpegQuality = 1 } = options;
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    const container = document.getElementById('pdf-export-container');
+    if (!container) {
+      console.error("PDF container not found");
+      return;
+    }
+
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdfWidth = 210;
+    const pdfHeight = 297;
+    const pageElements = Array.from(container.children);
+
+    for (let i = 0; i < pageElements.length; i++) {
+      const pageEl = pageElements[i] as HTMLElement;
+      const canvas = await html2canvas(pageEl, {
+        width: PAGE_WIDTH,
+        height: PAGE_HEIGHT,
+        scale: captureScale,
+        useCORS: true,
+        logging: false,
+        scrollY: 0,
+        scrollX: 0,
+        windowWidth: PAGE_WIDTH,
+        windowHeight: PAGE_HEIGHT,
+        imageTimeout: 0,
+      });
+
+      const imgData = format === 'png'
+        ? canvas.toDataURL('image/png')
+        : canvas.toDataURL('image/jpeg', jpegQuality);
+
+      if (i > 0) pdf.addPage();
+      pdf.addImage(imgData, format === 'png' ? 'PNG' : 'JPEG', 0, 0, pdfWidth, pdfHeight);
+    }
+
+    pdf.save(`project-${Date.now()}.pdf`);
+  };
+
+  const handleSaveNormalQuality = async () => {
     try {
       setIsSaving(true);
-      // Allow DOM to update and render the export container
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await savePdfWithOptions({ scale: 3, format: 'jpeg', jpegQuality: 1 });
+    } catch (error) {
+      console.error("Failed to save PDF:", error);
+      alert("PDF 저장 중 오류가 발생했습니다.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
-      const container = document.getElementById('pdf-export-container');
-      if (!container) {
-        console.error("PDF container not found");
-        setIsSaving(false);
-        return;
-      }
-
-      // Initialize jsPDF (A4 Portrait: 210mm x 297mm)
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = 210;
-      const pdfHeight = 297;
-
-      const pageElements = Array.from(container.children);
-      
-      for (let i = 0; i < pageElements.length; i++) {
-        const pageEl = pageElements[i] as HTMLElement;
-        
-        // 고정 크기로 캡처해 PDF 비율(210:297)과 일치시킴 → 이미지 세로 눌림 방지
-        const canvas = await html2canvas(pageEl, {
-          width: PAGE_WIDTH,
-          height: PAGE_HEIGHT,
-          scale: 2,
-          useCORS: true,
-          logging: false,
-          scrollY: 0,
-          scrollX: 0,
-          windowWidth: PAGE_WIDTH,
-          windowHeight: PAGE_HEIGHT,
-        });
-
-        const imgData = canvas.toDataURL('image/jpeg', 0.95);
-        
-        if (i > 0) {
-          pdf.addPage();
-        }
-
-        // 캡처 비율(794:1123 ≈ A4) 그대로 PDF에 맞춤
-        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-      }
-
-      pdf.save(`project-${Date.now()}.pdf`);
-
+  const handleSaveHighQuality = async () => {
+    try {
+      setIsSaving(true);
+      await savePdfWithOptions({ scale: 4, format: 'png' });
     } catch (error) {
       console.error("Failed to save PDF:", error);
       alert("PDF 저장 중 오류가 발생했습니다.");
@@ -526,14 +537,30 @@ function App() {
         if (!isInput) {
           e.preventDefault();
           if (selectedElementIds.length > 0) {
-            const elements = selectedElementIds
-              .map(id => visiblePages.flatMap(p => p.elements).find(el => el.id === id))
-              .filter((el): el is EditorElement => el != null);
+            const elements: EditorElement[] = [];
+            let sourcePageIndex: number | null = null;
+            for (const id of selectedElementIds) {
+              const el0 = activePage.elements.find(el => el.id === id);
+              if (el0) {
+                elements.push(el0);
+                if (sourcePageIndex === null) sourcePageIndex = activePageIndex;
+                continue;
+              }
+              if (secondPage) {
+                const el1 = secondPage.elements.find(el => el.id === id);
+                if (el1) {
+                  elements.push(el1);
+                  if (sourcePageIndex === null) sourcePageIndex = activePageIndex + 1;
+                }
+              }
+            }
             setClipboardElements(elements.map(el => JSON.parse(JSON.stringify(el))));
+            setClipboardSourcePageIndex(sourcePageIndex);
             setClipboardPage(null);
           } else {
             setClipboardPage(pages[activePageIndex]);
             setClipboardElements([]);
+            setClipboardSourcePageIndex(null);
           }
         }
       }
@@ -544,9 +571,12 @@ function App() {
           e.preventDefault();
           if (clipboardElements.length > 0) {
             saveHistory();
+            const samePage = clipboardSourcePageIndex === activePageIndex;
+            const offsetX = samePage ? 20 : 0;
+            const offsetY = samePage ? 20 : 0;
             const pasted = clipboardElements.map(el => {
               const cloned = cloneElementWithNewIds(el);
-              return { ...cloned, x: cloned.x + 20, y: cloned.y + 20 };
+              return { ...cloned, x: cloned.x + offsetX, y: cloned.y + offsetY };
             });
             const nextPages = pages.map((p, i) =>
               i === activePageIndex
@@ -647,7 +677,7 @@ function App() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedElementIds, undo, redo, handleDeleteSelected, handleUpdateElement, handleUpdateElements, handleDeleteElement, handleSaveProject, pages, activePageIndex, clipboardPage, clipboardElements, visiblePages, saveHistory, cloneElementWithNewIds]);
+  }, [selectedElementIds, undo, redo, handleDeleteSelected, handleUpdateElement, handleUpdateElements, handleDeleteElement, handleSaveProject, pages, activePageIndex, clipboardPage, clipboardElements, clipboardSourcePageIndex, visiblePages, saveHistory, cloneElementWithNewIds]);
 
 
   return (
@@ -657,7 +687,8 @@ function App() {
         isDoublePage={isDoublePage} setIsDoublePage={setIsDoublePage}
         scale={scale} setScale={setScale}
         onUndo={undo} onRedo={redo}
-        onSave={handleSave}
+        onSaveNormalQuality={handleSaveNormalQuality}
+        onSaveHighQuality={handleSaveHighQuality}
         onSaveProject={handleSaveProject}
         isSaving={isSaving}
         onLoadBuiltInTemplate={handleLoadBuiltInTemplate}

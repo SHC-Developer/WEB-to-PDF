@@ -372,23 +372,110 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
         {selectedElement.type === 'shape' && (
            <div className="space-y-4">
               <div className="text-xs font-bold text-gray-700">도형 채우기</div>
-              <input 
-                 type="color" 
-                 value={styles.backgroundColor || '#cccccc'} 
-                 onMouseDown={record}
-                 onChange={(e) => handleChange('styles', { backgroundColor: e.target.value })}
-                 className="w-full h-8 rounded cursor-pointer border border-gray-200 p-0.5"
-              />
+              <div className="flex items-center gap-2">
+                 <input
+                   type="checkbox"
+                   id="shape-no-fill"
+                   checked={styles.backgroundColor === 'transparent'}
+                   onChange={(e) => {
+                     record();
+                     handleChange('styles', { backgroundColor: e.target.checked ? 'transparent' : '#cccccc' });
+                   }}
+                   className="accent-blue-500"
+                 />
+                 <label htmlFor="shape-no-fill" className="text-sm text-gray-700">채우기 없음</label>
+              </div>
+              {styles.backgroundColor !== 'transparent' && (
+                <input
+                  type="color"
+                  value={styles.backgroundColor || '#cccccc'}
+                  onMouseDown={record}
+                  onChange={(e) => handleChange('styles', { backgroundColor: e.target.value })}
+                  className="w-full h-8 rounded cursor-pointer border border-gray-200 p-0.5"
+                />
+              )}
               <div className="space-y-2">
                  <div className="flex justify-between text-xs text-gray-500"><span>모서리 반경</span> <span>{styles.borderRadius || 0}px</span></div>
-                 <input 
-                   type="range" 
-                   min="0" max="100" 
-                   value={styles.borderRadius || 0} 
+                 <input
+                   type="range"
+                   min="0" max="100"
+                   value={styles.borderRadius || 0}
                    onMouseDown={record}
                    onChange={(e) => handleChange('styles', { borderRadius: parseInt(e.target.value) })}
                    className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
                  />
+              </div>
+
+              <div className="space-y-4 pt-2 border-t border-gray-100">
+                 <div className="text-xs font-bold text-gray-700 flex justify-between items-center">
+                   <span>도형 테두리</span>
+                   <input
+                     type="checkbox"
+                     checked={!!styles.borderWidth && styles.borderWidth > 0}
+                     onChange={(e) => {
+                       record();
+                       if (e.target.checked) {
+                         handleChange('styles', { borderWidth: 1, borderColor: '#000000', borderStyle: 'solid' });
+                       } else {
+                         handleChange('styles', { borderWidth: 0 });
+                       }
+                     }}
+                     className="accent-blue-500"
+                   />
+                 </div>
+                 {styles.borderWidth != null && styles.borderWidth > 0 && (
+                   <>
+                     <div className="space-y-2">
+                       <div className="flex justify-between text-xs text-gray-500">
+                         <span>두께</span>
+                         <span>{styles.borderWidth}px</span>
+                       </div>
+                       <input
+                         type="range"
+                         min="1"
+                         max="20"
+                         value={styles.borderWidth}
+                         onMouseDown={record}
+                         onChange={(e) => handleChange('styles', { borderWidth: parseInt(e.target.value) })}
+                         className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                       />
+                     </div>
+                     <div className="space-y-2">
+                       <div className="text-xs text-gray-500">색상</div>
+                       <div className="flex gap-2 items-center">
+                         <input
+                           type="color"
+                           value={styles.borderColor || '#000000'}
+                           onMouseDown={record}
+                           onChange={(e) => handleChange('styles', { borderColor: e.target.value })}
+                           className="w-8 h-8 rounded cursor-pointer border border-gray-200 p-0.5"
+                         />
+                         <span className="text-xs text-gray-400 font-mono">{styles.borderColor || '#000000'}</span>
+                       </div>
+                     </div>
+                     <div className="space-y-2">
+                       <div className="text-xs text-gray-500">스타일</div>
+                       <div className="flex gap-1 flex-wrap">
+                         {(['solid', 'dashed', 'dotted', 'double'] as const).map((style) => (
+                           <button
+                             key={style}
+                             onClick={() => { record(); handleChange('styles', { borderStyle: style }); }}
+                             className={`px-2 py-1 text-xs rounded border ${
+                               (styles.borderStyle || 'solid') === style
+                                 ? 'bg-blue-50 border-blue-300 text-blue-700'
+                                 : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                             }`}
+                           >
+                             {style === 'solid' && '실선'}
+                             {style === 'dashed' && '대시'}
+                             {style === 'dotted' && '점선'}
+                             {style === 'double' && '이중선'}
+                           </button>
+                         ))}
+                       </div>
+                     </div>
+                   </>
+                 )}
               </div>
            </div>
         )}

@@ -17,6 +17,10 @@ interface CanvasProps {
 interface SnapLine {
   orientation: 'vertical' | 'horizontal';
   position: number;
+  /** Figma 스타일: 스냅된 라인 기준 좌(또는 상) 쪽 간격 px */
+  gapStart?: number;
+  /** Figma 스타일: 스냅된 라인 기준 우(또는 하) 쪽 간격 px */
+  gapEnd?: number;
 }
 
 export const Canvas: React.FC<CanvasProps> = ({ 
@@ -95,11 +99,11 @@ export const Canvas: React.FC<CanvasProps> = ({
 
     if (handleType === 'rotate') {
       setIsRotating(true);
+      const wrapperEl = (e.target as HTMLElement).closest('.element-wrapper') as HTMLElement | null;
       const ROTATE_SNAP_DEGREES = [0, 30, 45, 60, 90, 120, 135, 150, 180, 210, 225, 240, 270, 300, 315, 330];
       const snapAngularDist = (a: number, b: number) => Math.abs(((a - b + 540) % 360) - 180);
-      const startRotation = element.rotation ?? 0;
       const onMouseMove = (moveEvent: MouseEvent) => {
-        const rect = (moveEvent.target as HTMLElement).closest('.element-wrapper')?.getBoundingClientRect();
+        const rect = wrapperEl?.getBoundingClientRect();
         if (rect) {
           const centerX = rect.left + rect.width / 2;
           const centerY = rect.top + rect.height / 2;
@@ -126,13 +130,19 @@ export const Canvas: React.FC<CanvasProps> = ({
       document.addEventListener('mouseup', onMouseUp);
 
     } else if (handleType) {
-      // Resizing (Shift: lock aspect ratio)
+      // Resizing (Shift: lock aspect ratio) + 주변 객체 크기에 스냅
       setIsResizing(true);
+      setActiveSnapPageId(pageId);
       const startAspectRatio = startWidth / startHeight;
+      const SNAP_SIZE_THRESHOLD = 2;
 
       const onMouseMove = (moveEvent: MouseEvent) => {
-        const deltaX = (moveEvent.clientX - startX) / scale;
-        const deltaY = (moveEvent.clientY - startY) / scale;
+        let deltaX = (moveEvent.clientX - startX) / scale;
+        let deltaY = (moveEvent.clientY - startY) / scale;
+        if (moveEvent.ctrlKey || moveEvent.metaKey) {
+          deltaX = Math.round(deltaX);
+          deltaY = Math.round(deltaY);
+        }
         const lockRatio = moveEvent.shiftKey;
 
         let newX = startElX;
@@ -188,6 +198,59 @@ export const Canvas: React.FC<CanvasProps> = ({
           if (handleType.includes('w')) { newX = startElX + deltaX; newWidth = startWidth - deltaX; }
           if (handleType.includes('s')) newHeight = startHeight + deltaY;
           if (handleType.includes('n')) { newY = startElY + deltaY; newHeight = startHeight - deltaY; }
+        }
+
+        // 주변 객체 크기에 스냅 (이미지/텍스트 등 참조)
+        const otherWidths = currentPage.elements.filter(el => el.id !== element.id).map(el => el.width);
+        const otherHeights = currentPage.elements.filter(el => el.id !== element.id).map(el => el.height);
+        const snapToNearest = (val: number, targets: number[]) => {
+          let best = val;
+          let bestDist = SNAP_SIZE_THRESHOLD;
+          targets.forEach(t => {
+            const d = Math.abs(val - t);
+            if (d < bestDist) { bestDist = d; best = t; }
+          });
+          return best;
+        };
+        let snappedWidth = snapToNearest(newWidth, otherWidths);
+        let snappedHeight = snapToNearest(newHeight, otherHeights);
+        if (lockRatio) {
+          if (snappedWidth !== newWidth && snappedHeight === newHeight) {
+            snappedHeight = Math.round(snappedWidth / startAspectRatio);
+          } else if (snappedHeight !== newHeight && snappedWidth === newWidth) {
+            snappedWidth = Math.round(snappedHeight * startAspectRatio);
+          } else if (snappedWidth !== newWidth && snappedHeight !== newHeight) {
+            const dw = Math.abs(snappedWidth - newWidth);
+            const dh = Math.abs(snappedHeight - newHeight);
+            if (dw < dh) snappedHeight = Math.round(snappedWidth / startAspectRatio);
+            else snappedWidth = Math.round(snappedHeight * startAspectRatio);
+          }
+        }
+        const widthSnapped = snappedWidth !== newWidth;
+        const heightSnapped = snappedHeight !== newHeight;
+        if (snappedWidth !== newWidth) {
+          newWidth = snappedWidth;
+          if (handleType.includes('w')) newX = startElX + startWidth - newWidth;
+        }
+        if (snappedHeight !== newHeight) {
+          newHeight = snappedHeight;
+          if (handleType.includes('n')) newY = startElY + startHeight - newHeight;
+        }
+
+        // 크기 스냅 시 분홍 가이드 라인 표시
+        if (widthSnapped || heightSnapped) {
+          const sizeSnapLines: SnapLine[] = [];
+          if (widthSnapped) {
+            sizeSnapLines.push({ orientation: 'vertical', position: newX });
+            sizeSnapLines.push({ orientation: 'vertical', position: newX + newWidth });
+          }
+          if (heightSnapped) {
+            sizeSnapLines.push({ orientation: 'horizontal', position: newY });
+            sizeSnapLines.push({ orientation: 'horizontal', position: newY + newHeight });
+          }
+          setSnapLines(sizeSnapLines);
+        } else {
+          setSnapLines([]);
         }
 
         if (newWidth > 10 && newHeight > 10) {
@@ -283,7 +346,24 @@ export const Canvas: React.FC<CanvasProps> = ({
             });
         });
         
-        // Refine Snap Lines: Only keep lines that correspond to the actual snapped position
+        // Refine Snap Lines: Only keep lines that correspond to the actual snapped position + Figma 스타일 간격(px)
+        const computeGapsVertical = (pos: number) => {
+          const others = currentPage.elements.filter(el => el.id !== element.id);
+          const leftEdges = others.filter(el => el.x + el.width <= pos).map(el => el.x + el.width);
+          const rightEdges = others.filter(el => el.x >= pos).map(el => el.x);
+          const gapStart = leftEdges.length ? pos - Math.max(...leftEdges) : pos;
+          const gapEnd = rightEdges.length ? Math.min(...rightEdges) - pos : PAGE_WIDTH - pos;
+          return { gapStart: Math.round(gapStart), gapEnd: Math.round(gapEnd) };
+        };
+        const computeGapsHorizontal = (pos: number) => {
+          const others = currentPage.elements.filter(el => el.id !== element.id);
+          const topEdges = others.filter(el => el.y + el.height <= pos).map(el => el.y + el.height);
+          const bottomEdges = others.filter(el => el.y >= pos).map(el => el.y);
+          const gapStart = topEdges.length ? pos - Math.max(...topEdges) : pos;
+          const gapEnd = bottomEdges.length ? Math.min(...bottomEdges) - pos : PAGE_HEIGHT - pos;
+          return { gapStart: Math.round(gapStart), gapEnd: Math.round(gapEnd) };
+        };
+
         const finalSnapLines: SnapLine[] = [];
         if (Math.abs(snappedX - proposedX) > 0.01) {
              candidatesX.forEach(cand => {
@@ -291,7 +371,8 @@ export const Canvas: React.FC<CanvasProps> = ({
                  snapTargetsX.forEach(target => {
                      if (Math.abs(currentVal - target) < 0.1) {
                          if (!finalSnapLines.some(l => l.orientation === 'vertical' && l.position === target)) {
-                             finalSnapLines.push({ orientation: 'vertical', position: target });
+                             const { gapStart, gapEnd } = computeGapsVertical(target);
+                             finalSnapLines.push({ orientation: 'vertical', position: target, gapStart, gapEnd });
                          }
                      }
                  });
@@ -303,7 +384,8 @@ export const Canvas: React.FC<CanvasProps> = ({
                  snapTargetsY.forEach(target => {
                      if (Math.abs(currentVal - target) < 0.1) {
                          if (!finalSnapLines.some(l => l.orientation === 'horizontal' && l.position === target)) {
-                             finalSnapLines.push({ orientation: 'horizontal', position: target });
+                             const { gapStart, gapEnd } = computeGapsHorizontal(target);
+                             finalSnapLines.push({ orientation: 'horizontal', position: target, gapStart, gapEnd });
                          }
                      }
                  });
@@ -526,16 +608,74 @@ export const Canvas: React.FC<CanvasProps> = ({
     return (
       <>
         {snapLines.map((line, i) => (
-          <div
-            key={i}
-            className="absolute bg-pink-500 z-[60] pointer-events-none"
-            style={{
-              left: line.orientation === 'vertical' ? line.position : 0,
-              top: line.orientation === 'horizontal' ? line.position : 0,
-              width: line.orientation === 'vertical' ? '1px' : '100%',
-              height: line.orientation === 'horizontal' ? '1px' : '100%',
-            }}
-          />
+          <React.Fragment key={i}>
+            <div
+              className="absolute bg-pink-500 z-[60] pointer-events-none"
+              style={{
+                left: line.orientation === 'vertical' ? line.position - 1 : 0,
+                top: line.orientation === 'horizontal' ? line.position - 1 : 0,
+                width: line.orientation === 'vertical' ? '2px' : '100%',
+                height: line.orientation === 'horizontal' ? '2px' : '100%',
+              }}
+            />
+            {/* Figma 스타일: 좌우/상하 간격(px) 라벨 */}
+            {(line.gapStart != null || line.gapEnd != null) && (
+              <>
+                {line.orientation === 'vertical' && (
+                  <>
+                    {line.gapStart != null && (
+                      <div
+                        className="absolute z-[61] pointer-events-none bg-pink-500 text-white text-[10px] font-mono px-1.5 py-0.5 rounded whitespace-nowrap"
+                        style={{
+                          left: Math.max(0, line.position - 40),
+                          top: 4,
+                        }}
+                      >
+                        {line.gapStart}px
+                      </div>
+                    )}
+                    {line.gapEnd != null && (
+                      <div
+                        className="absolute z-[61] pointer-events-none bg-pink-500 text-white text-[10px] font-mono px-1.5 py-0.5 rounded whitespace-nowrap"
+                        style={{
+                          left: line.position + 4,
+                          top: 4,
+                        }}
+                      >
+                        {line.gapEnd}px
+                      </div>
+                    )}
+                  </>
+                )}
+                {line.orientation === 'horizontal' && (
+                  <>
+                    {line.gapStart != null && (
+                      <div
+                        className="absolute z-[61] pointer-events-none bg-pink-500 text-white text-[10px] font-mono px-1.5 py-0.5 rounded whitespace-nowrap"
+                        style={{
+                          left: 4,
+                          top: Math.max(0, line.position - 10),
+                        }}
+                      >
+                        {line.gapStart}px
+                      </div>
+                    )}
+                    {line.gapEnd != null && (
+                      <div
+                        className="absolute z-[61] pointer-events-none bg-pink-500 text-white text-[10px] font-mono px-1.5 py-0.5 rounded whitespace-nowrap"
+                        style={{
+                          left: 4,
+                          top: line.position + 4,
+                        }}
+                      >
+                        {line.gapEnd}px
+                      </div>
+                    )}
+                  </>
+                )}
+              </>
+            )}
+          </React.Fragment>
         ))}
       </>
     );
