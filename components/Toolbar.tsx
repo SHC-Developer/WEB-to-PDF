@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Icons } from './Icons';
+import type { DocumentPreset } from '../types';
 
 interface ToolbarProps {
   showGrid: boolean;
@@ -14,8 +15,10 @@ interface ToolbarProps {
   onSaveHighQuality?: () => void;
   onSaveProject?: () => void;
   isSaving?: boolean;
+  documentPreset?: DocumentPreset;
   onLoadBuiltInTemplate?: (templateId: string) => void;
   onLoadTemplateFromFile?: (file: File) => void;
+  onSwitchToBusinessCard?: () => void;
 }
 
 const BUILT_IN_TEMPLATES = [
@@ -31,8 +34,10 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   onSaveHighQuality,
   onSaveProject,
   isSaving = false,
+  documentPreset = 'a4',
   onLoadBuiltInTemplate,
   onLoadTemplateFromFile,
+  onSwitchToBusinessCard,
 }) => {
   const [templateMenuOpen, setTemplateMenuOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -113,6 +118,22 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             className="hidden"
           />
         </div>
+
+        {/* 명함 디자인: 명함 전용 빈 문서로 전환 */}
+        {onSwitchToBusinessCard && (
+          <button
+            onClick={onSwitchToBusinessCard}
+            className={`flex items-center gap-2 px-3 py-2 text-sm rounded transition-colors ${
+              documentPreset === 'businessCard'
+                ? 'bg-indigo-100 text-indigo-700 border border-indigo-200'
+                : 'text-gray-600 hover:bg-gray-100 border border-transparent'
+            }`}
+            title="명함(90×50mm) 디자인만 할 수 있는 빈 문서로 전환"
+          >
+            <Icons.Shape size={18} />
+            <span>명함 디자인</span>
+          </button>
+        )}
       </div>
 
       <div className="flex items-center gap-4">
@@ -137,7 +158,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-2 py-1 rounded border border-gray-200">
            <button onClick={() => setScale(Math.max(0.5, scale - 0.1))} className="hover:text-blue-600 px-1">-</button>
            <span className="w-10 text-center">{Math.round(scale * 100)}%</span>
-           <button onClick={() => setScale(Math.min(2, scale + 0.1))} className="hover:text-blue-600 px-1">+</button>
+           <button onClick={() => setScale(Math.min(documentPreset === 'businessCard' ? 5 : 2, scale + 0.1))} className="hover:text-blue-600 px-1">+</button>
         </div>
         
         {onSaveProject && (

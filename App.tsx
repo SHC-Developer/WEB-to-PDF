@@ -5,8 +5,8 @@ import { Toolbar } from './components/Toolbar';
 import { Canvas } from './components/Canvas';
 import { PropertiesPanel } from './components/PropertiesPanel';
 import { StaticPage } from './components/StaticPage';
-import { INITIAL_PAGES, PAGE_WIDTH, PAGE_HEIGHT } from './constants';
-import { Page, EditorElement } from './types';
+import { INITIAL_PAGES, getPageSize } from './constants';
+import { Page, EditorElement, DocumentPreset } from './types';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 
@@ -31,6 +31,9 @@ function App() {
   const [showGrid, setShowGrid] = useState(false);
   const [isDoublePage, setIsDoublePage] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [documentPreset, setDocumentPreset] = useState<DocumentPreset>('a4');
+
+  const { widthPx: pageWidth, heightPx: pageHeight, widthMm: pageWidthMm, heightMm: pageHeightMm } = getPageSize(documentPreset);
 
   /** 프로젝트 저장 시 선택한 파일 핸들 (Ctrl+S 두 번째부터 같은 파일에 덮어쓰기) */
   const projectFileHandleRef = useRef<FileSystemFileHandle | null>(null);
@@ -170,7 +173,75 @@ function App() {
     input.click();
   };
 
-  const handleAddShape = (shapeType: 'rect' | 'circle') => {
+  const handleAddChart = () => {
+    saveHistory();
+    const newElement: EditorElement = {
+      id: `chart-${Date.now()}`,
+      type: 'chart',
+      x: 150,
+      y: 150,
+      width: 300,
+      height: 200,
+      styles: {},
+      chartData: {
+        chartType: 'bar',
+        data: [
+          { label: '1월', value: 40 },
+          { label: '2월', value: 30 },
+          { label: '3월', value: 50 },
+          { label: '4월', value: 20 },
+        ],
+      },
+    };
+    addContentToPage(newElement);
+  };
+
+  const handleAddTable = () => {
+    saveHistory();
+    const rows = 3;
+    const cols = 3;
+    const cellContents = Array.from({ length: rows }, () => Array(cols).fill(''));
+    const newElement: EditorElement = {
+      id: `table-${Date.now()}`,
+      type: 'table',
+      x: 100,
+      y: 100,
+      width: 300,
+      height: 120,
+      styles: {
+        borderColor: '#000000',
+        borderWidth: 1,
+        borderStyle: 'solid',
+        fontSize: 14,
+      },
+      tableData: { rows, cols, cellContents },
+    };
+    addContentToPage(newElement);
+  };
+
+  const handleAddLine = () => {
+    saveHistory();
+    const newElement: EditorElement = {
+      id: `line-${Date.now()}`,
+      type: 'line',
+      x: 150,
+      y: 200,
+      width: 200,
+      height: 24,
+      styles: {
+        borderColor: '#000000',
+        borderWidth: 2,
+        borderStyle: 'solid'
+      },
+      lineStart: { x: 0, y: 0.5 },
+      lineEnd: { x: 1, y: 0.5 },
+      arrowStart: false,
+      arrowEnd: true
+    };
+    addContentToPage(newElement);
+  };
+
+  const handleAddShape = (shapeType: 'rect' | 'circle' | 'triangle' | 'diamond' | 'arrow' | 'star') => {
     saveHistory();
     const newElement: EditorElement = {
       id: `shape-${Date.now()}`,
@@ -182,7 +253,8 @@ function App() {
       content: '',
       styles: {
         backgroundColor: '#e7926b',
-        borderRadius: shapeType === 'circle' ? 999 : 0
+        borderRadius: shapeType === 'circle' ? 999 : 0,
+        shapeType: shapeType === 'rect' || shapeType === 'circle' ? shapeType : shapeType
       }
     };
     addContentToPage(newElement);
@@ -294,6 +366,83 @@ function App() {
     setSelectedElementIds(newGroupIds);
   };
 
+  /** 정렬: 선택된 여러 요소를 페이지 기준으로 정렬 */
+  const handleAlignElements = (align: 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom') => {
+    if (selectedElementIds.length < 2) return;
+    saveHistory();
+    const elements = selectedElementIds.flatMap(id => {
+      for (const p of visiblePages) {
+        const el = p.elements.find(e => e.id === id);
+        if (el) return [el];
+      }
+      return [];
+    });
+    if (elements.length < 2) return;
+    const minX = Math.min(...elements.map(e => e.x));
+    const maxX = Math.max(...elements.map(e => e.x + e.width));
+    const minY = Math.min(...elements.map(e => e.y));
+    const maxY = Math.max(...elements.map(e => e.y + e.height));
+    const centerX = (minX + maxX) / 2;
+    const centerY = (minY + maxY) / 2;
+    const updates: { id: string; updates: Partial<EditorElement> }[] = [];
+    for (const el of elements) {
+      let x = el.x, y = el.y;
+      if (align === 'left') x = minX;
+      else if (align === 'center') x = centerX - el.width / 2;
+      else if (align === 'right') x = maxX - el.width;
+      else if (align === 'top') y = minY;
+      else if (align === 'middle') y = centerY - el.height / 2;
+      else if (align === 'bottom') y = maxY - el.height;
+      updates.push({ id: el.id, updates: { x, y } });
+    }
+    handleUpdateElements(updates);
+  };
+
+  /** 분배: 선택된 여러 요소를 균등 간격으로 배치 */
+  const handleUpdateTableData = (id: string, tableData: { rows: number; cols: number; cellContents: string[][] }) => {
+    handleUpdateElement(id, { tableData });
+  };
+
+  const handleDistributeElements = (mode: 'horizontal' | 'vertical') => {
+    if (selectedElementIds.length < 3) return;
+    saveHistory();
+    const elements = selectedElementIds.flatMap(id => {
+      for (const p of visiblePages) {
+        const el = p.elements.find(e => e.id === id);
+        if (el) return [el];
+      }
+      return [];
+    });
+    if (elements.length < 3) return;
+    const sorted = mode === 'horizontal'
+      ? [...elements].sort((a, b) => a.x + a.width / 2 - (b.x + b.width / 2))
+      : [...elements].sort((a, b) => a.y + a.height / 2 - (b.y + b.height / 2));
+    const first = sorted[0];
+    const last = sorted[sorted.length - 1];
+    const totalSpace = mode === 'horizontal'
+      ? (last.x + last.width) - first.x
+      : (last.y + last.height) - first.y;
+    const sumSizes = mode === 'horizontal'
+      ? sorted.reduce((s, e) => s + e.width, 0)
+      : sorted.reduce((s, e) => s + e.height, 0);
+    const totalGap = totalSpace - sumSizes;
+    const gapCount = sorted.length - 1;
+    const gap = gapCount > 0 ? totalGap / gapCount : 0;
+    const updates: { id: string; updates: Partial<EditorElement> }[] = [];
+    let offset = 0;
+    for (let i = 0; i < sorted.length; i++) {
+      const el = sorted[i];
+      if (mode === 'horizontal') {
+        updates.push({ id: el.id, updates: { x: first.x + offset } });
+        offset += el.width + gap;
+      } else {
+        updates.push({ id: el.id, updates: { y: first.y + offset } });
+        offset += el.height + gap;
+      }
+    }
+    handleUpdateElements(updates);
+  };
+
   const handleUngroup = () => {
     if (selectedElementIds.length === 0) return;
     saveHistory();
@@ -378,8 +527,20 @@ function App() {
   // --- Template Loading (기본만 내장, 나머지는 JSON 파일로만 불러오기) ---
   const handleLoadBuiltInTemplate = useCallback((templateId: string) => {
     if (templateId === 'default') {
+      setDocumentPreset('a4');
       setPages(JSON.parse(JSON.stringify(INITIAL_PAGES)));
     }
+    setHistory([]);
+    setFuture([]);
+    setActivePageIndex(0);
+    setSelectedElementIds([]);
+  }, []);
+
+  /** 명함 디자인 전용: 빈 명함 1장으로 전환 (명함은 작으므로 기본 확대 2.5배) */
+  const handleSwitchToBusinessCard = useCallback(() => {
+    setDocumentPreset('businessCard');
+    setScale(2.5);
+    setPages([{ id: `p${Date.now()}`, title: '명함 1', backgroundColor: '#ffffff', elements: [] }]);
     setHistory([]);
     setFuture([]);
     setActivePageIndex(0);
@@ -392,13 +553,21 @@ function App() {
       try {
         const text = e.target?.result as string;
         const data = JSON.parse(text);
-        if (!Array.isArray(data)) {
-          throw new Error('유효한 Page 배열이 아닙니다.');
+        // 지원 형식: { pages, documentPreset? } 또는 Page[] (기존)
+        let pages: Page[];
+        let preset: DocumentPreset = 'a4';
+        if (Array.isArray(data)) {
+          pages = data;
+        } else if (data && Array.isArray(data.pages)) {
+          pages = data.pages;
+          if (data.documentPreset === 'businessCard' || data.documentPreset === 'a4') preset = data.documentPreset;
+        } else {
+          throw new Error('유효한 Page 배열 또는 { pages, documentPreset } 형식이 아닙니다.');
         }
-        const pages = data as Page[];
         if (pages.some(p => !p.id || !p.title || !Array.isArray(p.elements))) {
           throw new Error('Page 형식이 올바르지 않습니다.');
         }
+        setDocumentPreset(preset);
         setPages(pages);
         setHistory([]);
         setFuture([]);
@@ -406,13 +575,13 @@ function App() {
         setSelectedElementIds([]);
       } catch (err) {
         console.error('Template load error:', err);
-        alert('템플릿 파일을 불러올 수 없습니다. 형식이 올바른 JSON(Page[])인지 확인해주세요.');
+        alert('템플릿 파일을 불러올 수 없습니다. 형식이 올바른 JSON(Page[] 또는 { pages, documentPreset })인지 확인해주세요.');
       }
     };
     reader.readAsText(file);
   }, []);
 
-  // --- PDF Export (공통: scale/포맷 옵션) ---
+  // --- PDF Export (공통: scale/포맷 옵션, 현재 documentPreset 크기 사용) ---
   const savePdfWithOptions = async (options: { scale: number; format: 'jpeg' | 'png'; jpegQuality?: number }) => {
     const { scale: captureScale, format, jpegQuality = 1 } = options;
     await new Promise(resolve => setTimeout(resolve, 100));
@@ -423,23 +592,26 @@ function App() {
       return;
     }
 
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const pdfWidth = 210;
-    const pdfHeight = 297;
+    const isLandscape = documentPreset === 'businessCard';
+    const pdf = new jsPDF({
+      orientation: isLandscape ? 'l' : 'p',
+      unit: 'mm',
+      format: [pageWidthMm, pageHeightMm],
+    });
     const pageElements = Array.from(container.children);
 
     for (let i = 0; i < pageElements.length; i++) {
       const pageEl = pageElements[i] as HTMLElement;
       const canvas = await html2canvas(pageEl, {
-        width: PAGE_WIDTH,
-        height: PAGE_HEIGHT,
+        width: pageWidth,
+        height: pageHeight,
         scale: captureScale,
         useCORS: true,
         logging: false,
         scrollY: 0,
         scrollX: 0,
-        windowWidth: PAGE_WIDTH,
-        windowHeight: PAGE_HEIGHT,
+        windowWidth: pageWidth,
+        windowHeight: pageHeight,
         imageTimeout: 0,
       });
 
@@ -447,8 +619,8 @@ function App() {
         ? canvas.toDataURL('image/png')
         : canvas.toDataURL('image/jpeg', jpegQuality);
 
-      if (i > 0) pdf.addPage();
-      pdf.addImage(imgData, format === 'png' ? 'PNG' : 'JPEG', 0, 0, pdfWidth, pdfHeight);
+      if (i > 0) pdf.addPage([pageWidthMm, pageHeightMm]);
+      pdf.addImage(imgData, format === 'png' ? 'PNG' : 'JPEG', 0, 0, pageWidthMm, pageHeightMm);
     }
 
     pdf.save(`project-${Date.now()}.pdf`);
@@ -460,7 +632,8 @@ function App() {
       await savePdfWithOptions({ scale: 3, format: 'jpeg', jpegQuality: 1 });
     } catch (error) {
       console.error("Failed to save PDF:", error);
-      alert("PDF 저장 중 오류가 발생했습니다.");
+      const message = error instanceof Error ? error.message : String(error);
+      alert(`PDF 저장 중 오류가 발생했습니다.\n${message}`);
     } finally {
       setIsSaving(false);
     }
@@ -472,7 +645,8 @@ function App() {
       await savePdfWithOptions({ scale: 4, format: 'png' });
     } catch (error) {
       console.error("Failed to save PDF:", error);
-      alert("PDF 저장 중 오류가 발생했습니다.");
+      const message = error instanceof Error ? error.message : String(error);
+      alert(`PDF 저장 중 오류가 발생했습니다.\n${message}`);
     } finally {
       setIsSaving(false);
     }
@@ -480,7 +654,8 @@ function App() {
 
   // 프로젝트 저장: 첫 저장 = 다른 이름으로 저장(파일 선택), 이후 = 같은 파일에 덮어쓰기
   const handleSaveProject = useCallback(async () => {
-    const json = JSON.stringify(pages, null, 2);
+    const state = { pages, documentPreset };
+    const json = JSON.stringify(state, null, 2);
     const blob = new Blob([json], { type: 'application/json' });
 
     const writeToHandle = async (handle: FileSystemFileHandle) => {
@@ -517,7 +692,7 @@ function App() {
       console.error(err);
       alert('저장 중 오류가 발생했습니다.');
     }
-  }, [pages]);
+  }, [pages, documentPreset]);
 
   // Keyboard Shortcuts
   useEffect(() => {
@@ -685,8 +860,10 @@ function App() {
         onSaveHighQuality={handleSaveHighQuality}
         onSaveProject={handleSaveProject}
         isSaving={isSaving}
+        documentPreset={documentPreset}
         onLoadBuiltInTemplate={handleLoadBuiltInTemplate}
         onLoadTemplateFromFile={handleLoadTemplateFromFile}
+        onSwitchToBusinessCard={handleSwitchToBusinessCard}
       />
       
       <div className="flex flex-1 overflow-hidden relative">
@@ -697,6 +874,9 @@ function App() {
           onAddText={handleAddText}
           onAddImage={handleAddImage}
           onAddShape={handleAddShape}
+          onAddLine={handleAddLine}
+          onAddTable={handleAddTable}
+          onAddChart={handleAddChart}
         />
         
         {/* Context Drawer (Thumbnails) */}
@@ -704,6 +884,8 @@ function App() {
           activeTool={activeTool}
           pages={pages} 
           activePageIndex={activePageIndex}
+          pageWidth={pageWidth}
+          pageHeight={pageHeight}
           onPageSelect={(index) => {
             setActivePageIndex(index);
             setSelectedElementIds([]);
@@ -724,6 +906,8 @@ function App() {
           secondPage={secondPage}
           scale={scale}
           showGrid={showGrid}
+          pageWidth={pageWidth}
+          pageHeight={pageHeight}
           selectedElementIds={selectedElementIds}
           onSelectElements={setSelectedElementIds}
           onUpdateElement={handleUpdateElement}
@@ -735,6 +919,8 @@ function App() {
           selectedElement={selectedElement}
           selectedElementIds={selectedElementIds}
           activePage={activePage}
+          pageWidth={pageWidth}
+          pageHeight={pageHeight}
           onUpdateElement={handleUpdateElement}
           onUpdatePage={handleUpdatePage}
           onDeleteElement={handleDeleteElement}
@@ -742,6 +928,9 @@ function App() {
           onDuplicateElement={handleDuplicateElement}
           onGroup={handleGroup}
           onUngroup={handleUngroup}
+          onAlignElements={handleAlignElements}
+          onDistributeElements={handleDistributeElements}
+          onUpdateTableData={handleUpdateTableData}
           onBringForward={(id) => handleLayerChange(id, 'front')}
           onSendBackward={(id) => handleLayerChange(id, 'back')}
           onRecordChange={saveHistory}
@@ -755,14 +944,14 @@ function App() {
           position: 'fixed', 
           top: 0, 
           left: -10000,
-          width: PAGE_WIDTH,
-          minWidth: PAGE_WIDTH,
+          width: pageWidth,
+          minWidth: pageWidth,
           display: 'flex',
           flexDirection: 'column',
         }}
       >
         {pages.map(page => (
-          <StaticPage key={page.id} page={page} />
+          <StaticPage key={page.id} page={page} pageWidth={pageWidth} pageHeight={pageHeight} />
         ))}
       </div>
     </div>

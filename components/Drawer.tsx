@@ -1,4 +1,5 @@
 import React from 'react';
+import { FONT_FAMILY_CSS } from '../constants';
 import { Icons } from './Icons';
 import { Page } from '../types';
 
@@ -6,6 +7,8 @@ interface DrawerProps {
   activeTool: string;
   pages: Page[];
   activePageIndex: number;
+  pageWidth: number;
+  pageHeight: number;
   onPageSelect: (index: number) => void;
   onAddPage: () => void;
   onDuplicatePage: (index: number) => void;
@@ -15,7 +18,9 @@ interface DrawerProps {
 export const Drawer: React.FC<DrawerProps> = ({ 
   activeTool, 
   pages, 
-  activePageIndex, 
+  activePageIndex,
+  pageWidth,
+  pageHeight,
   onPageSelect, 
   onAddPage,
   onDuplicatePage,
@@ -41,7 +46,7 @@ export const Drawer: React.FC<DrawerProps> = ({
                className={`relative cursor-pointer transition-all duration-200 rounded-lg overflow-hidden border-2 
                  ${activePageIndex === index ? 'border-blue-500 shadow-md ring-2 ring-blue-100' : 'border-transparent hover:border-gray-300'}
                `}
-               style={{ aspectRatio: '0.707' }} // A4 aspect ratio approx
+               style={{ aspectRatio: pageWidth / pageHeight }}
              >
                 {/* Miniature of the page */}
                 <div 
@@ -58,6 +63,7 @@ export const Drawer: React.FC<DrawerProps> = ({
                          color: el.styles.color,
                          fontSize: el.styles.fontSize,
                          fontWeight: el.styles.fontWeight,
+                         fontFamily: el.styles.fontFamily ? (FONT_FAMILY_CSS[el.styles.fontFamily] ?? el.styles.fontFamily) : undefined,
                          width: el.width,
                          whiteSpace: 'nowrap',
                          overflow: 'hidden',

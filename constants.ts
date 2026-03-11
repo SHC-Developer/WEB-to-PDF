@@ -1,8 +1,27 @@
-import { Page } from './types';
+import { Page, DocumentPreset } from './types';
 
-/** A4 페이지 크기 (96 DPI: 794×1123) - 캔버스·PDF 출력 기본값 */
-export const PAGE_WIDTH = 794;
-export const PAGE_HEIGHT = 1123;
+/** 문서 크기 프리셋 (재export) */
+export type { DocumentPreset };
+
+/** 프리셋별 크기 (mm, 96 DPI px) */
+export const PRESET_SIZES: Record<DocumentPreset, { widthMm: number; heightMm: number; widthPx: number; heightPx: number }> = {
+  a4:          { widthMm: 210,  heightMm: 297,  widthPx: 794,  heightPx: 1123 },
+  businessCard: { widthMm: 90,   heightMm: 50,   widthPx: 340,  heightPx: 189  },
+};
+
+export function getPageSize(preset: DocumentPreset) {
+  const s = PRESET_SIZES[preset];
+  return { widthPx: s.widthPx, heightPx: s.heightPx, widthMm: s.widthMm, heightMm: s.heightMm };
+}
+
+/** 텍스트 폰트 선택 시 CSS에 적용할 font-family 값 (한글/영문 폰트명 폴백) */
+export const FONT_FAMILY_CSS: Record<string, string> = {
+  'HY신명조': '"HY신명조", "HY Shin MyeongJo", serif',
+};
+
+/** A4 페이지 크기 (96 DPI: 794×1123) - 캔버스·PDF 출력 기본값 (하위 호환) */
+export const PAGE_WIDTH = PRESET_SIZES.a4.widthPx;
+export const PAGE_HEIGHT = PRESET_SIZES.a4.heightPx;
 
 export const INITIAL_PAGES: Page[] = [
   {

@@ -1,19 +1,34 @@
 import React from 'react';
 import { Page, EditorElement } from '../types';
-import { PAGE_WIDTH, PAGE_HEIGHT } from '../constants';
+import { FONT_FAMILY_CSS } from '../constants';
+import { ShapeRenderer } from './ShapeRenderer';
+import { LineRenderer } from './LineRenderer';
+import { TableRenderer } from './TableRenderer';
+import { ChartRenderer } from './ChartRenderer';
 
 interface StaticPageProps {
   page: Page;
+  pageWidth: number;
+  pageHeight: number;
 }
 
-const renderElementContent = (el: EditorElement) => (
+const renderElementContent = (el: EditorElement) => {
+  const baseStyle: React.CSSProperties = el.type === 'line'
+    ? { overflow: 'visible' }
+    : el.type === 'table' || el.type === 'chart'
+    ? { overflow: 'hidden' }
+    : {
+        ...el.styles,
+        display: el.type === 'text' ? 'flex' : undefined,
+        alignItems: el.type === 'text' ? (el.styles.alignItems || 'center') : undefined,
+        ...(el.styles.fontFamily && FONT_FAMILY_CSS[el.styles.fontFamily]
+          ? { fontFamily: FONT_FAMILY_CSS[el.styles.fontFamily] }
+          : {}),
+      };
+  return (
   <div
-    className={`w-full h-full ${el.type === 'text' ? '' : 'overflow-hidden'}`}
-    style={{
-      ...el.styles,
-      display: el.type === 'text' ? 'flex' : undefined,
-      alignItems: el.type === 'text' ? (el.styles.alignItems || 'center') : undefined,
-    }}
+    className={`w-full h-full ${el.type === 'text' ? '' : el.type === 'line' ? '' : 'overflow-hidden'}`}
+    style={baseStyle}
   >
     {el.type === 'text' && (
       <div className="w-full break-words whitespace-pre-wrap" style={{ cursor: 'text' }}>
@@ -43,13 +58,17 @@ const renderElementContent = (el: EditorElement) => (
         />
       </div>
     )}
-    {el.type === 'shape' && <div className="w-full h-full" />}
+    {el.type === 'shape' && <ShapeRenderer element={el} className="w-full h-full" />}
+    {el.type === 'line' && <LineRenderer element={el} width={el.width} height={el.height} className="w-full h-full" />}
+    {el.type === 'table' && <TableRenderer element={el} className="w-full h-full" />}
+    {el.type === 'chart' && <ChartRenderer element={el} width={el.width} height={el.height} className="w-full h-full" />}
   </div>
-);
+  );
+};
 
 // A simplified version of Canvas that renders elements for PDF generation
 // No event handlers, selection outlines, or resize handles.
-export const StaticPage: React.FC<StaticPageProps> = ({ page }) => {
+export const StaticPage: React.FC<StaticPageProps> = ({ page, pageWidth, pageHeight }) => {
   const renderElement = (element: EditorElement) => {
     if (element.type === 'group') {
       return (
@@ -103,8 +122,8 @@ export const StaticPage: React.FC<StaticPageProps> = ({ page }) => {
 
   const margin = page.contentArea?.margin ?? 0;
   const contentBg = page.contentArea?.backgroundColor ?? 'transparent';
-  const contentWidth = PAGE_WIDTH - 2 * margin;
-  const contentHeight = PAGE_HEIGHT - 2 * margin;
+  const contentWidth = pageWidth - 2 * margin;
+  const contentHeight = pageHeight - 2 * margin;
 
   const contentArea = margin > 0 ? (
     <div
@@ -128,8 +147,8 @@ export const StaticPage: React.FC<StaticPageProps> = ({ page }) => {
     <div
       className="relative overflow-hidden bg-white"
       style={{
-        width: `${PAGE_WIDTH}px`,
-        height: `${PAGE_HEIGHT}px`,
+        width: `${pageWidth}px`,
+        height: `${pageHeight}px`,
         backgroundColor: page.backgroundColor,
       }}
     >

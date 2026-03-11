@@ -1,13 +1,19 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Page, EditorElement } from '../types';
-import { PAGE_WIDTH, PAGE_HEIGHT } from '../constants';
+import { FONT_FAMILY_CSS } from '../constants';
 import { Icons } from './Icons';
+import { ShapeRenderer } from './ShapeRenderer';
+import { LineRenderer } from './LineRenderer';
+import { TableRenderer } from './TableRenderer';
+import { ChartRenderer } from './ChartRenderer';
 
 interface CanvasProps {
   page: Page;
   secondPage?: Page | null; // For double page view
   scale: number;
   showGrid: boolean;
+  pageWidth: number;
+  pageHeight: number;
   selectedElementIds: string[];
   onSelectElements: (ids: string[]) => void;
   onUpdateElement: (id: string, updates: Partial<EditorElement>) => void;
@@ -28,6 +34,8 @@ export const Canvas: React.FC<CanvasProps> = ({
   secondPage, 
   scale, 
   showGrid,
+  pageWidth,
+  pageHeight,
   selectedElementIds,
   onSelectElements,
   onUpdateElement,
@@ -85,9 +93,9 @@ export const Canvas: React.FC<CanvasProps> = ({
 
     // Prepare Snap Targets (only for dragging currently to keep it simple and robust)
     // Vertical Lines (X coordinates)
-    const snapTargetsX: number[] = [0, PAGE_WIDTH / 2, PAGE_WIDTH]; // Page Left, Center, Right
+    const snapTargetsX: number[] = [0, pageWidth / 2, pageWidth]; // Page Left, Center, Right
     // Horizontal Lines (Y coordinates)
-    const snapTargetsY: number[] = [0, PAGE_HEIGHT / 2, PAGE_HEIGHT]; // Page Top, Middle, Bottom
+    const snapTargetsY: number[] = [0, pageHeight / 2, pageHeight]; // Page Top, Middle, Bottom
 
     currentPage.elements.forEach(el => {
       if (el.id === element.id) return;
@@ -352,7 +360,7 @@ export const Canvas: React.FC<CanvasProps> = ({
           const leftEdges = others.filter(el => el.x + el.width <= pos).map(el => el.x + el.width);
           const rightEdges = others.filter(el => el.x >= pos).map(el => el.x);
           const gapStart = leftEdges.length ? pos - Math.max(...leftEdges) : pos;
-          const gapEnd = rightEdges.length ? Math.min(...rightEdges) - pos : PAGE_WIDTH - pos;
+          const gapEnd = rightEdges.length ? Math.min(...rightEdges) - pos : pageWidth - pos;
           return { gapStart: Math.round(gapStart), gapEnd: Math.round(gapEnd) };
         };
         const computeGapsHorizontal = (pos: number) => {
@@ -360,7 +368,7 @@ export const Canvas: React.FC<CanvasProps> = ({
           const topEdges = others.filter(el => el.y + el.height <= pos).map(el => el.y + el.height);
           const bottomEdges = others.filter(el => el.y >= pos).map(el => el.y);
           const gapStart = topEdges.length ? pos - Math.max(...topEdges) : pos;
-          const gapEnd = bottomEdges.length ? Math.min(...bottomEdges) - pos : PAGE_HEIGHT - pos;
+          const gapEnd = bottomEdges.length ? Math.min(...bottomEdges) - pos : pageHeight - pos;
           return { gapStart: Math.round(gapStart), gapEnd: Math.round(gapEnd) };
         };
 
@@ -425,10 +433,20 @@ export const Canvas: React.FC<CanvasProps> = ({
 
   const renderElementContent = (el: EditorElement, options: { isGroupChild?: boolean; canEdit?: boolean } = {}) => {
     const { isGroupChild, canEdit } = options;
+    const baseStyle: React.CSSProperties = el.type === 'line'
+      ? { overflow: 'visible' }
+      : el.type === 'table' || el.type === 'chart'
+        ? { overflow: 'hidden' }
+        : {
+            ...el.styles,
+            ...(el.styles.fontFamily && FONT_FAMILY_CSS[el.styles.fontFamily]
+              ? { fontFamily: FONT_FAMILY_CSS[el.styles.fontFamily] }
+              : {}),
+          };
     return (
       <div
-        className={`w-full h-full ${el.type === 'text' ? '' : 'overflow-hidden'}`}
-        style={{ ...el.styles }}
+        className={`w-full h-full ${el.type === 'text' ? '' : el.type === 'line' ? '' : 'overflow-hidden'}`}
+        style={baseStyle}
       >
         {el.type === 'text' && (
           <div
@@ -462,7 +480,28 @@ export const Canvas: React.FC<CanvasProps> = ({
           />
         )}
         {el.type === 'shape' && (
-          <div className="w-full h-full flex items-center justify-center pointer-events-none" />
+          <ShapeRenderer element={el} className="w-full h-full flex items-center justify-center pointer-events-none" />
+        )}
+        {el.type === 'line' && (
+          <LineRenderer element={el} width={el.width} height={el.height} className="w-full h-full pointer-events-none" />
+        )}
+        {el.type === 'chart' && (
+          <ChartRenderer element={el} width={el.width} height={el.height} className="w-full h-full pointer-events-none" />
+        )}
+        {el.type === 'table' && (
+          <TableRenderer
+            element={el}
+            editable={canEdit}
+            onCellChange={(row, col, value) => {
+              const data = el.tableData ?? { rows: 2, cols: 2, cellContents: [['', ''], ['', '']] };
+              const updated = data.cellContents.map((r, ri) =>
+                ri === row ? r.map((c, ci) => (ci === col ? value : c)) : r
+              );
+              onUpdateElement(el.id, { tableData: { ...data, cellContents: updated } });
+            }}
+            onRecordChange={onRecordChange}
+            className={canEdit ? '' : 'pointer-events-none'}
+          />
         )}
       </div>
     );
@@ -732,19 +771,50 @@ export const Canvas: React.FC<CanvasProps> = ({
     onSelectElements([]);
   };
 
+  const totalContentWidth = secondPage ? pageWidth * 2 + 4 : pageWidth;
+  const totalContentHeight = pageHeight;
+  const scaledWidth = scale * totalContentWidth;
+  const scaledHeight = scale * totalContentHeight;
+
+  /** 피그마처럼 항상 상하좌우 스크롤 가능한 무한 캔버스 공간 크기 */
+  const INFINITE_CANVAS_SIZE = 10000;
+  const CONTENT_OFFSET = 2000;
+
+  useEffect(() => {
+    const el = canvasRef.current;
+    if (!el) return;
+    el.scrollLeft = CONTENT_OFFSET - 80;
+    el.scrollTop = CONTENT_OFFSET - 80;
+  }, [page?.id, secondPage?.id]);
+
   return (
-    <div 
-      className="flex-1 bg-gray-200 overflow-auto flex items-start justify-center p-12 relative"
-      onClick={handleCanvasClick}
+    <div
       ref={canvasRef}
+      className="flex-1 bg-gray-200 overflow-auto relative min-h-0"
+      onClick={handleCanvasClick}
     >
-      <div className={`flex gap-1 transition-transform duration-200 ease-out`} style={{ transform: `scale(${scale})` }}>
-        
+      <div
+        className="relative bg-gray-200"
+        style={{ width: INFINITE_CANVAS_SIZE, height: INFINITE_CANVAS_SIZE, minWidth: INFINITE_CANVAS_SIZE, minHeight: INFINITE_CANVAS_SIZE }}
+      >
+        <div
+          className="absolute transition-all duration-200 ease-out"
+          style={{
+            left: CONTENT_OFFSET,
+            top: CONTENT_OFFSET,
+            width: scaledWidth,
+            height: scaledHeight,
+          }}
+        >
+          <div
+            className="flex gap-1 origin-top-left"
+            style={{ transform: `scale(${scale})`, width: totalContentWidth, height: totalContentHeight }}
+          >
         {/* Page 1 */}
         <div 
           className="bg-white shadow-xl relative overflow-hidden"
           style={{ 
-            width: `${PAGE_WIDTH}px`, height: `${PAGE_HEIGHT}px`,
+            width: `${pageWidth}px`, height: `${pageHeight}px`,
             backgroundColor: page.backgroundColor
           }}
           onMouseDown={(e) => handlePageMouseDown(e, page.id)}
@@ -767,8 +837,8 @@ export const Canvas: React.FC<CanvasProps> = ({
               style={{
                 left: page.contentArea.margin,
                 top: page.contentArea.margin,
-                width: PAGE_WIDTH - 2 * page.contentArea.margin,
-                height: PAGE_HEIGHT - 2 * page.contentArea.margin,
+                width: pageWidth - 2 * page.contentArea.margin,
+                height: pageHeight - 2 * page.contentArea.margin,
                 backgroundColor: page.contentArea.backgroundColor ?? '#f3f4f6',
               }}
             >
@@ -796,7 +866,7 @@ export const Canvas: React.FC<CanvasProps> = ({
           <div 
             className="bg-white shadow-xl relative overflow-hidden"
             style={{ 
-              width: `${PAGE_WIDTH}px`, height: `${PAGE_HEIGHT}px`,
+              width: `${pageWidth}px`, height: `${pageHeight}px`,
               backgroundColor: secondPage.backgroundColor
             }}
             onMouseDown={(e) => handlePageMouseDown(e, secondPage.id)}
@@ -818,8 +888,8 @@ export const Canvas: React.FC<CanvasProps> = ({
                 style={{
                   left: secondPage.contentArea.margin,
                   top: secondPage.contentArea.margin,
-                  width: PAGE_WIDTH - 2 * secondPage.contentArea.margin,
-                  height: PAGE_HEIGHT - 2 * secondPage.contentArea.margin,
+                  width: pageWidth - 2 * secondPage.contentArea.margin,
+                  height: pageHeight - 2 * secondPage.contentArea.margin,
                   backgroundColor: secondPage.contentArea.backgroundColor ?? '#f3f4f6',
                 }}
               >
@@ -843,6 +913,8 @@ export const Canvas: React.FC<CanvasProps> = ({
           </div>
         )}
 
+          </div>
+        </div>
       </div>
       
       {/* Floating Info */}
