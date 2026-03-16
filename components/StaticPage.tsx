@@ -49,6 +49,7 @@ const renderElementContent = (el: EditorElement) => {
             display: 'table-cell',
             verticalAlign: ALIGN_TO_VALIGN[el.styles.alignItems || 'center'] || 'middle',
             width: '100%',
+            wordBreak: 'keep-all',
           }}
         >
           {el.styles?.textAlign === 'justify' ? (
@@ -66,6 +67,7 @@ const renderElementContent = (el: EditorElement) => {
               className="break-words whitespace-pre-wrap"
               style={{
                 textAlign: el.styles?.textAlign || 'left',
+                wordBreak: 'keep-all',
               }}
             >
               {el.content}

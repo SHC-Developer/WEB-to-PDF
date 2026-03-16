@@ -464,6 +464,7 @@ export const Canvas: React.FC<CanvasProps> = ({
               alignItems: el.styles.alignItems || 'center',
               pointerEvents: !isGroupChild && canEdit ? 'auto' : 'none',
               width: '100%',
+              wordBreak: 'keep-all',
             }}
           >
             {el.styles.textAlign === 'justify' && !canEdit ? (
@@ -483,6 +484,7 @@ export const Canvas: React.FC<CanvasProps> = ({
                   width: '100%',
                   display: 'block',
                   textAlign: el.styles.textAlign || 'left',
+                  wordBreak: 'keep-all',
                 }}
               >
                 {el.content}
