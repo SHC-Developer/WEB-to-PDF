@@ -128,7 +128,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                 ? 'bg-indigo-100 text-indigo-700 border border-indigo-200'
                 : 'text-gray-600 hover:bg-gray-100 border border-transparent'
             }`}
-            title="명함(90×50mm) 디자인만 할 수 있는 빈 문서로 전환"
+            title="명함(92×52mm) 디자인만 할 수 있는 빈 문서로 전환"
           >
             <Icons.Shape size={18} />
             <span>명함 디자인</span>

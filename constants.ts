@@ -6,7 +6,7 @@ export type { DocumentPreset };
 /** 프리셋별 크기 (mm, 96 DPI px) */
 export const PRESET_SIZES: Record<DocumentPreset, { widthMm: number; heightMm: number; widthPx: number; heightPx: number }> = {
   a4:          { widthMm: 210,  heightMm: 297,  widthPx: 794,  heightPx: 1123 },
-  businessCard: { widthMm: 90,   heightMm: 50,   widthPx: 340,  heightPx: 189  },
+  businessCard: { widthMm: 92,   heightMm: 52,   widthPx: 348,  heightPx: 197  },
 };
 
 export function getPageSize(preset: DocumentPreset) {

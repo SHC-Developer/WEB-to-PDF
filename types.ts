@@ -92,6 +92,6 @@ export interface AppState {
   scale: number;
   showGrid: boolean;
   isDoublePage: boolean;
-  /** 문서 크기: A4 카탈로그 또는 명함(90×50mm) */
+  /** 문서 크기: A4 카탈로그 또는 명함(92×52mm) */
   documentPreset: DocumentPreset;
 }

@@ -31,12 +31,14 @@ function App() {
   const [showGrid, setShowGrid] = useState(false);
   const [isDoublePage, setIsDoublePage] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDraggingJson, setIsDraggingJson] = useState(false);
   const [documentPreset, setDocumentPreset] = useState<DocumentPreset>('a4');
 
   const { widthPx: pageWidth, heightPx: pageHeight, widthMm: pageWidthMm, heightMm: pageHeightMm } = getPageSize(documentPreset);
 
   /** 프로젝트 저장 시 선택한 파일 핸들 (Ctrl+S 두 번째부터 같은 파일에 덮어쓰기) */
   const projectFileHandleRef = useRef<FileSystemFileHandle | null>(null);
+  const dragCounterRef = useRef(0);
 
   // Helper to get active page
   const activePage = pages[activePageIndex];
@@ -600,6 +602,53 @@ function App() {
     reader.readAsText(file);
   }, []);
 
+  const isJsonFile = useCallback((file: File) => {
+    const fileName = file.name.toLowerCase();
+    return file.type === 'application/json' || fileName.endsWith('.json');
+  }, []);
+
+  const getDroppedJsonFile = useCallback((fileList: FileList | null) => {
+    if (!fileList) return null;
+    return Array.from(fileList).find(isJsonFile) ?? null;
+  }, [isJsonFile]);
+
+  const handleAppDragEnter = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    if (!e.dataTransfer.types.includes('Files')) return;
+    e.preventDefault();
+    dragCounterRef.current += 1;
+    setIsDraggingJson(true);
+  }, []);
+
+  const handleAppDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    if (!e.dataTransfer.types.includes('Files')) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+  }, []);
+
+  const handleAppDragLeave = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    if (!e.dataTransfer.types.includes('Files')) return;
+    e.preventDefault();
+    dragCounterRef.current = Math.max(0, dragCounterRef.current - 1);
+    if (dragCounterRef.current === 0) {
+      setIsDraggingJson(false);
+    }
+  }, []);
+
+  const handleAppDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    if (!e.dataTransfer.types.includes('Files')) return;
+    e.preventDefault();
+    dragCounterRef.current = 0;
+    setIsDraggingJson(false);
+
+    const file = getDroppedJsonFile(e.dataTransfer.files);
+    if (!file) {
+      alert('JSON 파일만 드래그 앤 드롭으로 불러올 수 있습니다.');
+      return;
+    }
+
+    handleLoadTemplateFromFile(file);
+  }, [getDroppedJsonFile, handleLoadTemplateFromFile]);
+
   // --- PDF Export (공통: scale/포맷 옵션, 현재 documentPreset 크기 그대로 사용) ---
   const savePdfWithOptions = async (options: {
     scale: number;
@@ -900,7 +949,13 @@ function App() {
 
 
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden text-slate-800 bg-gray-100">
+    <div
+      className="flex flex-col h-screen w-screen overflow-hidden text-slate-800 bg-gray-100"
+      onDragEnter={handleAppDragEnter}
+      onDragOver={handleAppDragOver}
+      onDragLeave={handleAppDragLeave}
+      onDrop={handleAppDrop}
+    >
       <Toolbar 
         showGrid={showGrid} setShowGrid={setShowGrid}
         isDoublePage={isDoublePage} setIsDoublePage={setIsDoublePage}
@@ -957,6 +1012,7 @@ function App() {
           secondPage={secondPage}
           scale={scale}
           showGrid={showGrid}
+          documentPreset={documentPreset}
           pageWidth={pageWidth}
           pageHeight={pageHeight}
           selectedElementIds={selectedElementIds}
@@ -987,6 +1043,15 @@ function App() {
           onRecordChange={saveHistory}
         />
       </div>
+
+      {isDraggingJson && (
+        <div className="fixed inset-0 z-[200] pointer-events-none bg-blue-500/10 flex items-center justify-center">
+          <div className="rounded-xl border-2 border-dashed border-blue-400 bg-white/90 px-8 py-6 text-center shadow-lg">
+            <div className="text-lg font-semibold text-blue-700">JSON 파일을 놓으면 템플릿을 불러옵니다</div>
+            <div className="mt-1 text-sm text-gray-600">`.json` 프로젝트/템플릿 파일만 지원됩니다.</div>
+          </div>
+        </div>
+      )}
 
       {/* Hidden Container for PDF Generation - 고정 크기로 레이아웃 보장 */}
       <div 

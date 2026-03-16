@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Page, EditorElement } from '../types';
-import { FONT_FAMILY_CSS } from '../constants';
+import { Page, EditorElement, DocumentPreset } from '../types';
+import { FONT_FAMILY_CSS, PRESET_SIZES } from '../constants';
 import { Icons } from './Icons';
 import { ShapeRenderer } from './ShapeRenderer';
 import { LineRenderer } from './LineRenderer';
@@ -12,6 +12,7 @@ interface CanvasProps {
   secondPage?: Page | null; // For double page view
   scale: number;
   showGrid: boolean;
+  documentPreset: DocumentPreset;
   pageWidth: number;
   pageHeight: number;
   selectedElementIds: string[];
@@ -34,6 +35,7 @@ export const Canvas: React.FC<CanvasProps> = ({
   secondPage, 
   scale, 
   showGrid,
+  documentPreset,
   pageWidth,
   pageHeight,
   selectedElementIds,
@@ -56,6 +58,31 @@ export const Canvas: React.FC<CanvasProps> = ({
   const marqueeJustFinishedRef = useRef(false);
 
   const canvasRef = useRef<HTMLDivElement>(null);
+
+  const insertEditableLineBreak = () => {
+    if (typeof document.execCommand === 'function') {
+      document.execCommand('insertLineBreak');
+      return;
+    }
+
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+
+    const range = selection.getRangeAt(0);
+    range.deleteContents();
+    const br = document.createElement('br');
+    range.insertNode(br);
+    range.setStartAfter(br);
+    range.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(range);
+  };
+
+  const normalizeEditableText = (value: string) =>
+    value
+      .replace(/\r\n/g, '\n')
+      .replace(/\u00A0/g, ' ')
+      .replace(/\n+$/, '');
 
   // Mouse event handlers for Move/Resize/Rotate
   const handleMouseDown = (e: React.MouseEvent, element: EditorElement, pageId: string, handleType?: string) => {
@@ -450,14 +477,10 @@ export const Canvas: React.FC<CanvasProps> = ({
       >
         {el.type === 'text' && (
           <div
-            className="w-full h-full break-words whitespace-pre-wrap outline-none"
-            contentEditable={!isGroupChild && canEdit}
-            suppressContentEditableWarning
+            className="w-full h-full whitespace-pre-wrap"
             onMouseDown={(e) => {
               if (!isGroupChild && canEdit) e.stopPropagation();
             }}
-            onFocus={() => onRecordChange()}
-            onBlur={(e) => onUpdateElement(el.id, { content: e.currentTarget.innerText })}
             style={{
               cursor: 'text',
               display: 'flex',
@@ -467,7 +490,29 @@ export const Canvas: React.FC<CanvasProps> = ({
               wordBreak: 'keep-all',
             }}
           >
-            {el.styles.textAlign === 'justify' && !canEdit ? (
+            {!isGroupChild && canEdit ? (
+              <div
+                className="w-full whitespace-pre-wrap break-words outline-none"
+                contentEditable
+                suppressContentEditableWarning
+                onFocus={() => onRecordChange()}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    insertEditableLineBreak();
+                  }
+                }}
+                onBlur={(e) => onUpdateElement(el.id, { content: normalizeEditableText(e.currentTarget.innerText) })}
+                style={{
+                  width: '100%',
+                  display: 'block',
+                  textAlign: el.styles.textAlign || 'left',
+                  wordBreak: 'keep-all',
+                }}
+              >
+                {el.content}
+              </div>
+            ) : el.styles.textAlign === 'justify' && !canEdit ? (
               <div style={{ width: '100%' }}>
                 {(el.content || '').split('\n').map((line, i) => (
                   <div key={i} style={{ display: 'flex', justifyContent: line.length > 1 ? 'space-between' : 'center', width: '100%' }}>
@@ -815,6 +860,10 @@ export const Canvas: React.FC<CanvasProps> = ({
   const totalContentHeight = pageHeight;
   const scaledWidth = scale * totalContentWidth;
   const scaledHeight = scale * totalContentHeight;
+  const presetSize = PRESET_SIZES[documentPreset];
+  const safeInsetX = pageWidth / presetSize.widthMm;
+  const safeInsetY = pageHeight / presetSize.heightMm;
+  const shouldShowBusinessCardSafeGuide = documentPreset === 'businessCard';
 
   /** 피그마처럼 항상 상하좌우 스크롤 가능한 무한 캔버스 공간 크기 */
   const INFINITE_CANVAS_SIZE = 10000;
@@ -871,6 +920,18 @@ export const Canvas: React.FC<CanvasProps> = ({
             />
           )}
           {showGrid && <div className="absolute top-0 left-0 w-full h-4 bg-gray-100 border-b border-gray-300 z-0 text-[8px] flex items-end px-1 text-gray-400">0px</div>}
+          {shouldShowBusinessCardSafeGuide && (
+            <div
+              className="absolute pointer-events-none z-[1]"
+              style={{
+                left: safeInsetX,
+                top: safeInsetY,
+                width: pageWidth - safeInsetX * 2,
+                height: pageHeight - safeInsetY * 2,
+                border: '1px dashed rgba(34, 211, 238, 0.55)',
+              }}
+            />
+          )}
           {page.contentArea && page.contentArea.margin > 0 ? (
             <div
               className="absolute overflow-hidden"
@@ -922,6 +983,18 @@ export const Canvas: React.FC<CanvasProps> = ({
                   }} 
               />
             )}
+          {shouldShowBusinessCardSafeGuide && (
+            <div
+              className="absolute pointer-events-none z-[1]"
+              style={{
+                left: safeInsetX,
+                top: safeInsetY,
+                width: pageWidth - safeInsetX * 2,
+                height: pageHeight - safeInsetY * 2,
+                border: '1px dashed rgba(34, 211, 238, 0.55)',
+              }}
+            />
+          )}
             {secondPage.contentArea && secondPage.contentArea.margin > 0 ? (
               <div
                 className="absolute overflow-hidden"
