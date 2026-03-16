@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import { FONT_FAMILY_CSS } from '../constants';
 import { Icons } from './Icons';
 import { Page } from '../types';
@@ -13,6 +13,7 @@ interface DrawerProps {
   onAddPage: () => void;
   onDuplicatePage: (index: number) => void;
   onDeletePage: (index: number) => void;
+  onReorderPages: (fromIndex: number, toIndex: number) => void;
 }
 
 export const Drawer: React.FC<DrawerProps> = ({ 
@@ -24,8 +25,69 @@ export const Drawer: React.FC<DrawerProps> = ({
   onPageSelect, 
   onAddPage,
   onDuplicatePage,
-  onDeletePage
+  onDeletePage,
+  onReorderPages
 }) => {
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const listLengthRef = useRef(pages.length);
+  listLengthRef.current = pages.length;
+  const didDragRef = useRef(false);
+  const dragStartIndexRef = useRef<number | null>(null);
+  const dragOverIndexRef = useRef<number | null>(null);
+  const [dragStartIndex, setDragStartIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+
+  const getIndexUnder = useCallback((clientY: number) => {
+    const len = listLengthRef.current;
+    for (let i = 0; i < len; i++) {
+      const el = itemRefs.current[i];
+      if (!el) continue;
+      const rect = el.getBoundingClientRect();
+      if (clientY >= rect.top && clientY <= rect.bottom) return i;
+    }
+    return null;
+  }, []);
+
+  const handleThumbMouseDown = useCallback((e: React.MouseEvent, index: number) => {
+    if (e.button !== 0) return;
+    setDragStartIndex(index);
+    dragStartIndexRef.current = index;
+    setDragOverIndex(index);
+    dragOverIndexRef.current = index;
+    didDragRef.current = false;
+    const onMouseMove = (e: MouseEvent) => {
+      const idx = getIndexUnder(e.clientY);
+      if (idx !== null) {
+        setDragOverIndex(idx);
+        dragOverIndexRef.current = idx;
+      }
+    };
+    const onMouseUp = () => {
+      const start = dragStartIndexRef.current;
+      const over = dragOverIndexRef.current;
+      if (start !== null && over !== null && start !== over) {
+        onReorderPages(start, over);
+        didDragRef.current = true;
+      }
+      setDragStartIndex(null);
+      setDragOverIndex(null);
+      dragStartIndexRef.current = null;
+      dragOverIndexRef.current = null;
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  }, [getIndexUnder, onReorderPages]);
+
+  const handleThumbClick = useCallback((index: number) => {
+    if (didDragRef.current) {
+      didDragRef.current = false;
+      return;
+    }
+    onPageSelect(index);
+  }, [onPageSelect]);
+
   return (
     <div className="w-[280px] bg-[#f7f8fa] border-r border-gray-200 flex flex-col h-full shrink-0">
       <div className="p-4 border-b border-gray-200 bg-white">
@@ -40,11 +102,18 @@ export const Drawer: React.FC<DrawerProps> = ({
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {pages.map((page, index) => (
-          <div key={page.id} className="group relative">
+          <div
+            key={page.id}
+            ref={(el) => { itemRefs.current[index] = el; }}
+            className="group relative select-none"
+          >
              <div 
-               onClick={() => onPageSelect(index)}
-               className={`relative cursor-pointer transition-all duration-200 rounded-lg overflow-hidden border-2 
+               onClick={() => handleThumbClick(index)}
+               onMouseDown={(e) => handleThumbMouseDown(e, index)}
+               className={`relative transition-all duration-200 rounded-lg overflow-hidden border-2 
                  ${activePageIndex === index ? 'border-blue-500 shadow-md ring-2 ring-blue-100' : 'border-transparent hover:border-gray-300'}
+                 ${dragStartIndex === index ? 'cursor-grabbing opacity-80 scale-[0.98] shadow-lg' : 'cursor-grab'}
+                 ${dragOverIndex === index && dragStartIndex !== index ? 'ring-2 ring-blue-300 ring-offset-2' : ''}
                `}
                style={{ aspectRatio: pageWidth / pageHeight }}
              >
@@ -98,6 +167,8 @@ export const Drawer: React.FC<DrawerProps> = ({
              {/* Hover Actions */}
              <div className="absolute top-2 right-2 hidden group-hover:flex gap-1">
                 <button 
+                  type="button"
+                  onMouseDown={(e) => e.stopPropagation()}
                   onClick={(e) => { e.stopPropagation(); onDuplicatePage(index); }}
                   className="p-1.5 bg-white rounded shadow text-gray-600 hover:text-blue-500"
                   title="페이지 복제"
@@ -105,6 +176,8 @@ export const Drawer: React.FC<DrawerProps> = ({
                   <Icons.Copy size={14} />
                 </button>
                 <button 
+                  type="button"
+                  onMouseDown={(e) => e.stopPropagation()}
                   onClick={(e) => { e.stopPropagation(); onDeletePage(index); }}
                   className="p-1.5 bg-white rounded shadow text-gray-600 hover:text-red-500"
                   title="페이지 삭제"

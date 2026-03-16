@@ -466,9 +466,28 @@ export const Canvas: React.FC<CanvasProps> = ({
               width: '100%',
             }}
           >
-            <span className="break-words whitespace-pre-wrap" style={{ width: '100%', display: 'block', textAlign: el.styles.textAlign || 'left' }}>
-              {el.content}
-            </span>
+            {el.styles.textAlign === 'justify' && !canEdit ? (
+              <div style={{ width: '100%' }}>
+                {(el.content || '').split('\n').map((line, i) => (
+                  <div key={i} style={{ display: 'flex', justifyContent: line.length > 1 ? 'space-between' : 'center', width: '100%' }}>
+                    {line.split('').map((char, j) => (
+                      <span key={j}>{char}</span>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <span
+                className="break-words whitespace-pre-wrap"
+                style={{
+                  width: '100%',
+                  display: 'block',
+                  textAlign: el.styles.textAlign || 'left',
+                }}
+              >
+                {el.content}
+              </span>
+            )}
           </div>
         )}
         {el.type === 'image' && (
@@ -512,6 +531,11 @@ export const Canvas: React.FC<CanvasProps> = ({
     const isBeingDragged = draggingElementId === element.id;
     const blockPointerDuringDrag = (isDragging || isResizing || isRotating) && !isBeingDragged;
     const canEdit = isSelected && selectedElementIds.length === 1 && !element.locked && !isDragging;
+    const rotateHandleSize = 20 / scale;
+    const rotateHandleOffset = 28 / scale;
+    const resizeHandleSize = 8 / scale;
+    const resizeHandleOffset = 4 / scale;
+    const rotateIconSize = 12 / scale;
 
     if (element.type === 'group') {
       return (
@@ -551,23 +575,30 @@ export const Canvas: React.FC<CanvasProps> = ({
           {isSelected && selectedElementIds.length === 1 && !element.locked && (
             <>
               <div
-                className="absolute -top-8 left-1/2 -translate-x-1/2 w-6 h-6 bg-white border border-gray-300 rounded-full flex items-center justify-center cursor-grab active:cursor-grabbing shadow-sm hover:text-blue-500"
+                className="absolute left-1/2 -translate-x-1/2 bg-white border border-gray-300 rounded-full flex items-center justify-center cursor-grab active:cursor-grabbing shadow-sm hover:text-blue-500"
+                style={{
+                  top: -rotateHandleOffset,
+                  width: rotateHandleSize,
+                  height: rotateHandleSize,
+                }}
                 onMouseDown={(e) => handleMouseDown(e, element, pageId, 'rotate')}
               >
-                <Icons.Rotate size={12} />
+                <Icons.Rotate size={rotateIconSize} />
               </div>
               {['nw', 'n', 'ne', 'w', 'e', 'sw', 's', 'se'].map((dir) => (
                 <div
                   key={dir}
-                  className={`absolute w-2.5 h-2.5 bg-white border border-blue-500 rounded-sm z-50
+                  className={`absolute bg-white border border-blue-500 rounded-[2px] z-50
                     ${dir === 'n' || dir === 's' ? 'cursor-ns-resize' : ''}
                     ${dir === 'e' || dir === 'w' ? 'cursor-ew-resize' : ''}
                     ${dir === 'nw' || dir === 'se' ? 'cursor-nwse-resize' : ''}
                     ${dir === 'ne' || dir === 'sw' ? 'cursor-nesw-resize' : ''}
                   `}
                   style={{
-                    top: dir.includes('n') ? '-5px' : dir.includes('s') ? 'calc(100% - 5px)' : 'calc(50% - 5px)',
-                    left: dir.includes('w') ? '-5px' : dir.includes('e') ? 'calc(100% - 5px)' : 'calc(50% - 5px)',
+                    width: resizeHandleSize,
+                    height: resizeHandleSize,
+                    top: dir.includes('n') ? -resizeHandleOffset : dir.includes('s') ? `calc(100% - ${resizeHandleOffset}px)` : `calc(50% - ${resizeHandleOffset}px)`,
+                    left: dir.includes('w') ? -resizeHandleOffset : dir.includes('e') ? `calc(100% - ${resizeHandleOffset}px)` : `calc(50% - ${resizeHandleOffset}px)`,
                   }}
                   onMouseDown={(e) => handleMouseDown(e, element, pageId, dir)}
                 />
@@ -613,25 +644,32 @@ export const Canvas: React.FC<CanvasProps> = ({
           <>
             {/* Rotate Handle */}
             <div 
-              className="absolute -top-8 left-1/2 -translate-x-1/2 w-6 h-6 bg-white border border-gray-300 rounded-full flex items-center justify-center cursor-grab active:cursor-grabbing shadow-sm hover:text-blue-500"
+              className="absolute left-1/2 -translate-x-1/2 bg-white border border-gray-300 rounded-full flex items-center justify-center cursor-grab active:cursor-grabbing shadow-sm hover:text-blue-500"
+              style={{
+                top: -rotateHandleOffset,
+                width: rotateHandleSize,
+                height: rotateHandleSize,
+              }}
               onMouseDown={(e) => handleMouseDown(e, element, pageId, 'rotate')}
             >
-              <Icons.Rotate size={12} />
+              <Icons.Rotate size={rotateIconSize} />
             </div>
 
             {/* Resize Handles */}
             {['nw', 'n', 'ne', 'w', 'e', 'sw', 's', 'se'].map((dir) => (
               <div
                 key={dir}
-                className={`absolute w-2.5 h-2.5 bg-white border border-blue-500 rounded-sm z-50
+                className={`absolute bg-white border border-blue-500 rounded-[2px] z-50
                   ${dir === 'n' || dir === 's' ? 'cursor-ns-resize' : ''}
                   ${dir === 'e' || dir === 'w' ? 'cursor-ew-resize' : ''}
                   ${dir === 'nw' || dir === 'se' ? 'cursor-nwse-resize' : ''}
                   ${dir === 'ne' || dir === 'sw' ? 'cursor-nesw-resize' : ''}
                 `}
                 style={{
-                  top: dir.includes('n') ? '-5px' : dir.includes('s') ? 'calc(100% - 5px)' : 'calc(50% - 5px)',
-                  left: dir.includes('w') ? '-5px' : dir.includes('e') ? 'calc(100% - 5px)' : 'calc(50% - 5px)',
+                  width: resizeHandleSize,
+                  height: resizeHandleSize,
+                  top: dir.includes('n') ? -resizeHandleOffset : dir.includes('s') ? `calc(100% - ${resizeHandleOffset}px)` : `calc(50% - ${resizeHandleOffset}px)`,
+                  left: dir.includes('w') ? -resizeHandleOffset : dir.includes('e') ? `calc(100% - ${resizeHandleOffset}px)` : `calc(50% - ${resizeHandleOffset}px)`,
                 }}
                 onMouseDown={(e) => handleMouseDown(e, element, pageId, dir)}
               />

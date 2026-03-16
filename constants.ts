@@ -16,233 +16,61 @@ export function getPageSize(preset: DocumentPreset) {
 
 /** 텍스트 폰트 선택 시 CSS에 적용할 font-family 값 (한글/영문 폰트명 폴백) */
 export const FONT_FAMILY_CSS: Record<string, string> = {
+  'Malgun Gothic': '"Malgun Gothic", "맑은 고딕", sans-serif',
+  'Noto Sans KR': '"Noto Sans KR", "Malgun Gothic", "맑은 고딕", sans-serif',
+  Pretendard: '"Pretendard", "Noto Sans KR", "Malgun Gothic", sans-serif',
+  NanumGothic: '"NanumGothic", "Nanum Gothic", "Malgun Gothic", sans-serif',
+  Batang: '"Batang", "바탕", serif',
+  Dotum: '"Dotum", "돋움", sans-serif',
+  Gulim: '"Gulim", "굴림", sans-serif',
+  Gungsuh: '"Gungsuh", "궁서", serif',
   'HY신명조': '"HY신명조", "HY Shin MyeongJo", serif',
+  NanumMyeongjo: '"NanumMyeongjo", "Nanum Myeongjo", serif',
+  Arial: 'Arial, sans-serif',
+  'Times New Roman': '"Times New Roman", serif',
+  Georgia: 'Georgia, serif',
+  Verdana: 'Verdana, sans-serif',
+  Tahoma: 'Tahoma, sans-serif',
+  'Trebuchet MS': '"Trebuchet MS", sans-serif',
+  'Courier New': '"Courier New", monospace',
+  serif: 'serif',
+  'sans-serif': 'sans-serif',
+  monospace: 'monospace',
 };
+
+export const FONT_FAMILY_OPTIONS: { value: string; label: string }[] = [
+  { value: 'Malgun Gothic', label: '맑은 고딕' },
+  { value: 'Noto Sans KR', label: 'Noto Sans KR' },
+  { value: 'Pretendard', label: 'Pretendard' },
+  { value: 'NanumGothic', label: '나눔고딕' },
+  { value: 'HY신명조', label: 'HY신명조' },
+  { value: 'Batang', label: '바탕' },
+  { value: 'Dotum', label: '돋움' },
+  { value: 'Gulim', label: '굴림' },
+  { value: 'Gungsuh', label: '궁서' },
+  { value: 'NanumMyeongjo', label: '나눔명조' },
+  { value: 'Arial', label: 'Arial' },
+  { value: 'Times New Roman', label: 'Times New Roman' },
+  { value: 'Georgia', label: 'Georgia' },
+  { value: 'Verdana', label: 'Verdana' },
+  { value: 'Tahoma', label: 'Tahoma' },
+  { value: 'Trebuchet MS', label: 'Trebuchet MS' },
+  { value: 'Courier New', label: 'Courier New' },
+  { value: 'sans-serif', label: 'sans-serif' },
+  { value: 'serif', label: 'serif' },
+  { value: 'monospace', label: 'monospace' },
+];
 
 /** A4 페이지 크기 (96 DPI: 794×1123) - 캔버스·PDF 출력 기본값 (하위 호환) */
 export const PAGE_WIDTH = PRESET_SIZES.a4.widthPx;
 export const PAGE_HEIGHT = PRESET_SIZES.a4.heightPx;
 
+/** 앱 시작 시 기본 템플릿: 빈 A4 한 장 */
 export const INITIAL_PAGES: Page[] = [
   {
     id: 'p1',
-    title: 'Cover',
-    backgroundColor: '#eff6ff', // light blue tint
-    elements: [
-      {
-        id: 'e1',
-        type: 'text',
-        x: 60,
-        y: 80,
-        width: 500,
-        height: 60,
-        content: 'PET HOSPITAL',
-        styles: {
-          color: '#e7926b',
-          fontSize: 60,
-          fontWeight: 'bold',
-          textAlign: 'left'
-        }
-      },
-      {
-        id: 'e2',
-        type: 'text',
-        x: 60,
-        y: 150,
-        width: 400,
-        height: 60,
-        content: 'BROCHURE',
-        styles: {
-          color: '#e7926b',
-          fontSize: 60,
-          fontWeight: 'bold',
-          textAlign: 'left'
-        }
-      },
-      {
-        id: 'e3',
-        type: 'image',
-        x: 60,
-        y: 250,
-        width: 475,
-        height: 450,
-        content: 'https://picsum.photos/seed/building/600/800', // Placeholder
-        styles: {
-          borderRadius: 4
-        }
-      },
-      {
-        id: 'e4',
-        type: 'shape',
-        x: 0,
-        y: 700,
-        width: PAGE_WIDTH,
-        height: 142,
-        content: '',
-        styles: {
-          backgroundColor: '#1e293b'
-        }
-      },
-      {
-        id: 'e5',
-        type: 'text',
-        x: 40,
-        y: 720,
-        width: 500,
-        height: 30,
-        content: 'A Haven for Pet Wellness',
-        styles: {
-          color: '#ffffff',
-          fontSize: 24,
-          fontWeight: 500
-        }
-      },
-      {
-         id: 'e6',
-         type: 'shape',
-         x: 450,
-         y: 740,
-         width: 80,
-         height: 80,
-         content: '+',
-         styles: {
-            backgroundColor: '#ffedd5',
-            color: '#e7926b',
-            borderRadius: 8
-         }
-      }
-    ]
-  },
-  {
-    id: 'p2',
-    title: 'Contents',
+    title: '페이지 1',
     backgroundColor: '#ffffff',
-    elements: [
-       {
-         id: 'e2-1',
-         type: 'shape',
-         x: 0,
-         y: 0,
-         width: 80,
-         height: PAGE_HEIGHT,
-         content: '',
-         styles: {
-            backgroundColor: '#e7926b'
-         }
-       },
-       {
-        id: 'e2-2',
-        type: 'text',
-        x: 120,
-        y: 60,
-        width: 400,
-        height: 60,
-        content: 'CONTENTS',
-        styles: {
-          color: '#e7926b',
-          fontSize: 48,
-          fontWeight: 'bold',
-          textAlign: 'center'
-        }
-      },
-      // Decorative List
-      ...Array.from({ length: 5 }).map((_, i) => ({
-         id: `e2-list-${i}`,
-         type: 'shape' as const,
-         x: 150,
-         y: 180 + (i * 70),
-         width: 350,
-         height: 40,
-         content: '',
-         styles: {
-            backgroundColor: '#e7926b',
-            opacity: 0.8
-         }
-      })),
-       ...Array.from({ length: 5 }).map((_, i) => ({
-         id: `e2-text-${i}`,
-         type: 'text' as const,
-         x: 170,
-         y: 188 + (i * 70),
-         width: 300,
-         height: 30,
-         content: ['Brief Introduction', 'Our Team', 'Services Offered', 'Advanced Facilities', 'Preventive Care'][i],
-         styles: {
-            color: '#ffffff',
-            fontSize: 18,
-            fontWeight: 500
-         }
-      })),
-      ...Array.from({ length: 5 }).map((_, i) => ({
-         id: `e2-num-${i}`,
-         type: 'text' as const,
-         x: 100,
-         y: 188 + (i * 70),
-         width: 40,
-         height: 40,
-         content: `0${i + 1}`,
-         styles: {
-            color: '#e7926b',
-            fontSize: 24,
-            fontWeight: 'bold'
-         }
-      }))
-    ]
+    elements: [],
   },
-  {
-    id: 'p3',
-    title: 'Hospital Intro',
-    backgroundColor: '#ffffff',
-    elements: [
-        {
-            id: 'e3-1',
-            type: 'text',
-            x: 60,
-            y: 60,
-            width: 475,
-            height: 50,
-            content: 'HOSPITAL INTRODUCTION',
-            styles: {
-                color: '#e7926b',
-                fontSize: 32,
-                fontWeight: 'bold',
-                textAlign: 'center'
-            }
-        },
-        {
-            id: 'e3-2',
-            type: 'image',
-            x: 60,
-            y: 150,
-            width: 220,
-            height: 300,
-            content: 'https://picsum.photos/seed/hospital/300/400',
-            styles: {}
-        },
-        {
-            id: 'e3-3',
-            type: 'image',
-            x: 315,
-            y: 150,
-            width: 220,
-            height: 180,
-            content: 'https://picsum.photos/seed/doctor/300/250',
-            styles: {}
-        },
-        {
-           id: 'e3-4',
-           type: 'text',
-           x: 60,
-           y: 500,
-           width: 475,
-           height: 200,
-           content: 'We believe in preventive medicine and promote healthy lifestyles, empowering pet owners with the knowledge to maintain their pets optimal health. At our haven for pet wellness, every visit is tailored to your unique needs.',
-           styles: {
-               color: '#4b5563',
-               fontSize: 14,
-               fontWeight: 400
-           }
-        }
-    ]
-  }
 ];

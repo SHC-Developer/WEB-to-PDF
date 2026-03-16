@@ -12,6 +12,12 @@ interface StaticPageProps {
   pageHeight: number;
 }
 
+const ALIGN_TO_VALIGN: Record<string, 'top' | 'middle' | 'bottom'> = {
+  'flex-start': 'top',
+  'center': 'middle',
+  'flex-end': 'bottom',
+};
+
 const renderElementContent = (el: EditorElement) => {
   const baseStyle: React.CSSProperties = el.type === 'line'
     ? { overflow: 'visible' }
@@ -19,8 +25,6 @@ const renderElementContent = (el: EditorElement) => {
     ? { overflow: 'hidden' }
     : {
         ...el.styles,
-        display: el.type === 'text' ? 'flex' : undefined,
-        alignItems: el.type === 'text' ? (el.styles.alignItems || 'center') : undefined,
         ...(el.styles.fontFamily && FONT_FAMILY_CSS[el.styles.fontFamily]
           ? { fontFamily: FONT_FAMILY_CSS[el.styles.fontFamily] }
           : {}),
@@ -31,8 +35,43 @@ const renderElementContent = (el: EditorElement) => {
     style={baseStyle}
   >
     {el.type === 'text' && (
-      <div className="w-full break-words whitespace-pre-wrap" style={{ cursor: 'text' }}>
-        {el.content}
+      <div
+        style={{
+          display: 'table',
+          width: '100%',
+          height: '100%',
+          tableLayout: 'fixed',
+        }}
+      >
+        <div
+          className="break-words whitespace-pre-wrap"
+          style={{
+            display: 'table-cell',
+            verticalAlign: ALIGN_TO_VALIGN[el.styles.alignItems || 'center'] || 'middle',
+            width: '100%',
+          }}
+        >
+          {el.styles?.textAlign === 'justify' ? (
+            <div style={{ width: '100%' }}>
+              {(el.content || '').split('\n').map((line, i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: line.length > 1 ? 'space-between' : 'center', width: '100%' }}>
+                  {line.split('').map((char, j) => (
+                    <span key={j}>{char}</span>
+                  ))}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div
+              className="break-words whitespace-pre-wrap"
+              style={{
+                textAlign: el.styles?.textAlign || 'left',
+              }}
+            >
+              {el.content}
+            </div>
+          )}
+        </div>
       </div>
     )}
     {el.type === 'image' && (
@@ -87,6 +126,7 @@ export const StaticPage: React.FC<StaticPageProps> = ({ page, pageWidth, pageHei
             {element.groupChildren?.map((child) => (
               <div
                 key={child.id}
+                data-element-type={child.type}
                 style={{
                   position: 'absolute',
                   left: child.x,
@@ -105,6 +145,7 @@ export const StaticPage: React.FC<StaticPageProps> = ({ page, pageWidth, pageHei
     return (
       <div
         key={element.id}
+        data-element-type={element.type}
         style={{
           position: 'absolute',
           left: element.x,

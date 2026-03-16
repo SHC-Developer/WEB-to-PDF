@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Icons } from './Icons';
 import { EditorElement, Page } from '../types';
+import { FONT_FAMILY_OPTIONS } from '../constants';
 
 /** #RGB 또는 #RRGGBB 형식인지 검사 후, 적용 가능한 #RRGGBB 반환. 아니면 null */
 function parseHexColor(s: string): string | null {
@@ -64,6 +65,19 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
 }) => {
   /** 페이지 배경 헥사 입력 중일 때만 값 유지 (블러/엔터 시 적용) */
   const [pageBgHexInput, setPageBgHexInput] = useState<string | null>(null);
+  const [letterSpacingInput, setLetterSpacingInput] = useState('0');
+  const [lineHeightInput, setLineHeightInput] = useState('1.2');
+
+  useEffect(() => {
+    if (!selectedElement || selectedElement.type !== 'text') return;
+    setLetterSpacingInput(String(selectedElement.styles.letterSpacing ?? 0));
+    setLineHeightInput(String(selectedElement.styles.lineHeight ?? 1.2));
+  }, [
+    selectedElement?.id,
+    selectedElement?.type,
+    selectedElement?.styles.letterSpacing,
+    selectedElement?.styles.lineHeight,
+  ]);
 
   // Multiple selection: show group/ungroup and delete selected
   if (selectedElementIds.length > 1) {
@@ -190,6 +204,50 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   };
 
   const record = () => onRecordChange();
+  const commitLetterSpacing = () => {
+    const trimmed = letterSpacingInput.trim();
+    if (trimmed === '' || trimmed === '-' || trimmed === '.' || trimmed === '-.') {
+      setLetterSpacingInput(String(styles.letterSpacing ?? 0));
+      return;
+    }
+    const next = Number(trimmed);
+    if (!Number.isFinite(next)) {
+      setLetterSpacingInput(String(styles.letterSpacing ?? 0));
+      return;
+    }
+    const rounded = Math.round(next * 10) / 10;
+    handleChange('styles', { letterSpacing: rounded });
+    setLetterSpacingInput(String(rounded));
+  };
+  const commitLineHeight = () => {
+    const trimmed = lineHeightInput.trim();
+    if (trimmed === '' || trimmed === '-' || trimmed === '.' || trimmed === '-.') {
+      setLineHeightInput(String(styles.lineHeight ?? 1.2));
+      return;
+    }
+    const next = Number(trimmed);
+    if (!Number.isFinite(next)) {
+      setLineHeightInput(String(styles.lineHeight ?? 1.2));
+      return;
+    }
+    const clamped = Math.max(0, Math.round(next * 10) / 10);
+    handleChange('styles', { lineHeight: clamped });
+    setLineHeightInput(String(clamped));
+  };
+  const nudgeTextSpacing = (key: 'letterSpacing' | 'lineHeight', delta: number) => {
+    record();
+    if (key === 'letterSpacing') {
+      const current = styles.letterSpacing ?? 0;
+      const next = Math.round((current + delta) * 10) / 10;
+      handleChange('styles', { letterSpacing: next });
+      setLetterSpacingInput(String(next));
+      return;
+    }
+    const current = styles.lineHeight ?? 1.2;
+    const next = Math.max(0, Math.round((current + delta) * 10) / 10);
+    handleChange('styles', { lineHeight: next });
+    setLineHeightInput(String(next));
+  };
 
   return (
     <div className="w-[300px] bg-white border-l border-gray-200 flex flex-col h-full shrink-0 overflow-y-auto">
@@ -283,7 +341,9 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                  className="w-full py-1.5 px-2 text-sm border border-gray-200 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
                >
                  <option value="">기본</option>
-                 <option value="HY신명조">HY신명조</option>
+                 {FONT_FAMILY_OPTIONS.map(font => (
+                   <option key={font.value} value={font.value}>{font.label}</option>
+                 ))}
                </select>
              </div>
              
@@ -341,34 +401,78 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
              <div className="grid grid-cols-2 gap-2 items-start">
                <div className="flex flex-col min-h-[4.5rem]">
                  <label className="text-xs text-gray-500 block mb-1 h-4 flex-shrink-0">좌우 간격</label>
-                 <div className="flex items-center border border-gray-200 rounded px-2 h-9 flex-1 min-h-0">
+                 <div className="flex items-center border border-gray-200 rounded h-9 flex-1 min-h-0 overflow-hidden">
+                   <button
+                     type="button"
+                     onClick={() => nudgeTextSpacing('letterSpacing', -0.1)}
+                     className="h-full px-2 text-gray-500 hover:bg-gray-50 border-r border-gray-200"
+                     title="-0.1px"
+                   >
+                     -
+                   </button>
                    <input
-                     type="number"
-                     step={0.1}
-                     value={styles.letterSpacing ?? 0}
+                     type="text"
+                     inputMode="decimal"
+                     value={letterSpacingInput}
                      onFocus={record}
-                     onChange={(e) => handleChange('styles', { letterSpacing: Number(e.target.value) })}
-                     className="w-full py-1.5 text-sm outline-none h-full min-h-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                     onChange={(e) => setLetterSpacingInput(e.target.value)}
+                     onBlur={commitLetterSpacing}
+                     onKeyDown={(e) => {
+                       if (e.key === 'Enter') {
+                         commitLetterSpacing();
+                         (e.target as HTMLInputElement).blur();
+                       }
+                     }}
+                     className="w-full px-2 py-1.5 text-sm outline-none h-full min-h-0 text-center"
                      title="소수점 입력 가능 (예: 0.5, 1.2)"
                    />
                    <span className="text-xs text-gray-400 ml-1 flex-shrink-0">px</span>
+                   <button
+                     type="button"
+                     onClick={() => nudgeTextSpacing('letterSpacing', 0.1)}
+                     className="h-full px-2 text-gray-500 hover:bg-gray-50 border-l border-gray-200"
+                     title="+0.1px"
+                   >
+                     +
+                   </button>
                  </div>
                </div>
                <div className="flex flex-col min-h-[4.5rem]">
                  <label className="text-xs text-gray-500 block mb-1 h-4 flex-shrink-0">상하 간격</label>
-                 <div className="flex items-center border border-gray-200 rounded px-2 h-9 flex-1 min-h-0">
+                 <div className="flex items-center border border-gray-200 rounded h-9 flex-1 min-h-0 overflow-hidden">
+                   <button
+                     type="button"
+                     onClick={() => nudgeTextSpacing('lineHeight', -0.1)}
+                     className="h-full px-2 text-gray-500 hover:bg-gray-50 border-r border-gray-200"
+                     title="-0.1"
+                   >
+                     -
+                   </button>
                    <input
-                     type="number"
-                     step={0.01}
-                     min={0.5}
-                     max={3}
-                     value={styles.lineHeight ?? 1.2}
+                     type="text"
+                     inputMode="decimal"
+                     value={lineHeightInput}
                      onFocus={record}
-                     onChange={(e) => handleChange('styles', { lineHeight: Number(e.target.value) })}
-                     className="w-full py-1.5 text-sm outline-none h-full min-h-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                     onChange={(e) => setLineHeightInput(e.target.value)}
+                     onBlur={commitLineHeight}
+                     onKeyDown={(e) => {
+                       if (e.key === 'Enter') {
+                         commitLineHeight();
+                         (e.target as HTMLInputElement).blur();
+                       }
+                     }}
+                     className="w-full px-2 py-1.5 text-sm outline-none h-full min-h-0 text-center"
                      title="소수점 입력 가능 (예: 1.25, 1.5)"
                    />
                    <span className="text-xs text-gray-400 ml-1 flex-shrink-0">배수</span>
+                   <button
+                     type="button"
+                     onClick={() => nudgeTextSpacing('lineHeight', 0.1)}
+                     className="h-full px-2 text-gray-500 hover:bg-gray-50 border-l border-gray-200"
+                     title="+0.1"
+                   >
+                     +
+                   </button>
                  </div>
                </div>
              </div>

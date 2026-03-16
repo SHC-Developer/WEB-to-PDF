@@ -22,7 +22,7 @@ interface ToolbarProps {
 }
 
 const BUILT_IN_TEMPLATES = [
-  { id: 'default', label: '기본 (PET Hospital)' },
+  { id: 'default', label: '기본 (빈 페이지)' },
 ] as const;
 
 export const Toolbar: React.FC<ToolbarProps> = ({
@@ -177,7 +177,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             className={`px-4 py-2 rounded font-medium text-sm border transition-colors flex items-center gap-2
               ${isSaving ? 'bg-gray-200 border-gray-200 cursor-not-allowed text-gray-500' : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'}
             `}
-            title="PDF 일반화질 저장 (scale 3, JPEG)"
+            title="PDF 일반화질 저장"
           >
             {isSaving ? '저장 중...' : '일반화질 저장'}
           </button>
@@ -189,7 +189,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             className={`px-5 py-2 rounded font-medium text-sm transition-colors shadow-sm flex items-center gap-2
               ${isSaving ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#0091ff] hover:bg-[#007acc] text-white'}
             `}
-            title="PDF 고화질 저장 (scale 4, PNG 무손실)"
+            title="PDF 고화질 저장"
           >
             {isSaving ? '저장 중...' : '고화질 저장'}
           </button>

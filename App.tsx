@@ -7,7 +7,7 @@ import { PropertiesPanel } from './components/PropertiesPanel';
 import { StaticPage } from './components/StaticPage';
 import { INITIAL_PAGES, getPageSize } from './constants';
 import { Page, EditorElement, DocumentPreset } from './types';
-import html2canvas from 'html2canvas';
+import { toJpeg, toPng } from 'html-to-image';
 import { jsPDF } from 'jspdf';
 
 function App() {
@@ -27,7 +27,7 @@ function App() {
   const [activePageIndex, setActivePageIndex] = useState(0);
   const [selectedElementIds, setSelectedElementIds] = useState<string[]>([]);
   const selectedElementId = selectedElementIds[0] ?? null;
-  const [scale, setScale] = useState(0.8);
+  const [scale, setScale] = useState(1);
   const [showGrid, setShowGrid] = useState(false);
   const [isDoublePage, setIsDoublePage] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -524,10 +524,28 @@ function App() {
     }
   };
 
+  /** 좌측 썸네일 드래그로 페이지 순서 변경 */
+  const handleReorderPages = (fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex || toIndex < 0 || toIndex >= pages.length) return;
+    saveHistory();
+    const newPages = [...pages];
+    const [removed] = newPages.splice(fromIndex, 1);
+    newPages.splice(toIndex, 0, removed);
+    setPages(newPages);
+    if (activePageIndex === fromIndex) {
+      setActivePageIndex(toIndex);
+    } else if (fromIndex < activePageIndex && toIndex >= activePageIndex) {
+      setActivePageIndex(activePageIndex - 1);
+    } else if (fromIndex > activePageIndex && toIndex <= activePageIndex) {
+      setActivePageIndex(activePageIndex + 1);
+    }
+  };
+
   // --- Template Loading (기본만 내장, 나머지는 JSON 파일로만 불러오기) ---
   const handleLoadBuiltInTemplate = useCallback((templateId: string) => {
     if (templateId === 'default') {
       setDocumentPreset('a4');
+      setScale(1);
       setPages(JSON.parse(JSON.stringify(INITIAL_PAGES)));
     }
     setHistory([]);
@@ -539,7 +557,7 @@ function App() {
   /** 명함 디자인 전용: 빈 명함 1장으로 전환 (명함은 작으므로 기본 확대 2.5배) */
   const handleSwitchToBusinessCard = useCallback(() => {
     setDocumentPreset('businessCard');
-    setScale(2.5);
+    setScale(2);
     setPages([{ id: `p${Date.now()}`, title: '명함 1', backgroundColor: '#ffffff', elements: [] }]);
     setHistory([]);
     setFuture([]);
@@ -568,6 +586,7 @@ function App() {
           throw new Error('Page 형식이 올바르지 않습니다.');
         }
         setDocumentPreset(preset);
+        setScale(preset === 'businessCard' ? 2 : 1);
         setPages(pages);
         setHistory([]);
         setFuture([]);
@@ -581,10 +600,33 @@ function App() {
     reader.readAsText(file);
   }, []);
 
-  // --- PDF Export (공통: scale/포맷 옵션, 현재 documentPreset 크기 사용) ---
-  const savePdfWithOptions = async (options: { scale: number; format: 'jpeg' | 'png'; jpegQuality?: number }) => {
-    const { scale: captureScale, format, jpegQuality = 1 } = options;
+  // --- PDF Export (공통: scale/포맷 옵션, 현재 documentPreset 크기 그대로 사용) ---
+  const savePdfWithOptions = async (options: {
+    scale: number;
+    format: 'jpeg' | 'png';
+    jpegQuality?: number;
+    maxExportDimension?: number;
+    maxExportPixels?: number;
+    compressPdf?: boolean;
+  }) => {
+    const {
+      scale: captureScale,
+      format,
+      jpegQuality = 1,
+      maxExportDimension = 8192,
+      maxExportPixels = 67_000_000,
+      compressPdf = true,
+    } = options;
+    const MAX_EXPORT_DIMENSION = maxExportDimension;
+    const MAX_EXPORT_PIXELS = maxExportPixels;
+    const safeScaleByDimension = Math.min(MAX_EXPORT_DIMENSION / pageWidth, MAX_EXPORT_DIMENSION / pageHeight);
+    const safeScaleByArea = Math.sqrt(MAX_EXPORT_PIXELS / (pageWidth * pageHeight));
+    const safeCaptureScale = Math.max(1, Math.min(captureScale, safeScaleByDimension, safeScaleByArea));
+
     await new Promise(resolve => setTimeout(resolve, 100));
+    if ('fonts' in document) {
+      await (document as Document & { fonts: FontFaceSet }).fonts.ready;
+    }
 
     const container = document.getElementById('pdf-export-container');
     if (!container) {
@@ -592,35 +634,37 @@ function App() {
       return;
     }
 
+    const pageElements = Array.from(container.children);
+    const capturedImages: string[] = [];
+
+    for (let i = 0; i < pageElements.length; i++) {
+      const pageEl = pageElements[i] as HTMLElement;
+      const exportOptions = {
+        cacheBust: true,
+        pixelRatio: safeCaptureScale,
+        width: pageWidth,
+        height: pageHeight,
+        fontEmbedCSS: '',
+      };
+
+      const imageData = format === 'png'
+        ? await toPng(pageEl, exportOptions)
+        : await toJpeg(pageEl, { ...exportOptions, quality: jpegQuality });
+
+      capturedImages.push(imageData);
+    }
+
     const isLandscape = documentPreset === 'businessCard';
     const pdf = new jsPDF({
       orientation: isLandscape ? 'l' : 'p',
       unit: 'mm',
       format: [pageWidthMm, pageHeightMm],
+      compress: compressPdf,
     });
-    const pageElements = Array.from(container.children);
 
-    for (let i = 0; i < pageElements.length; i++) {
-      const pageEl = pageElements[i] as HTMLElement;
-      const canvas = await html2canvas(pageEl, {
-        width: pageWidth,
-        height: pageHeight,
-        scale: captureScale,
-        useCORS: true,
-        logging: false,
-        scrollY: 0,
-        scrollX: 0,
-        windowWidth: pageWidth,
-        windowHeight: pageHeight,
-        imageTimeout: 0,
-      });
-
-      const imgData = format === 'png'
-        ? canvas.toDataURL('image/png')
-        : canvas.toDataURL('image/jpeg', jpegQuality);
-
-      if (i > 0) pdf.addPage([pageWidthMm, pageHeightMm]);
-      pdf.addImage(imgData, format === 'png' ? 'PNG' : 'JPEG', 0, 0, pageWidthMm, pageHeightMm);
+    for (let i = 0; i < capturedImages.length; i++) {
+      if (i > 0) pdf.addPage([pageWidthMm, pageHeightMm], isLandscape ? 'l' : 'p');
+      pdf.addImage(capturedImages[i], format === 'png' ? 'PNG' : 'JPEG', 0, 0, pageWidthMm, pageHeightMm);
     }
 
     pdf.save(`project-${Date.now()}.pdf`);
@@ -642,7 +686,13 @@ function App() {
   const handleSaveHighQuality = async () => {
     try {
       setIsSaving(true);
-      await savePdfWithOptions({ scale: 4, format: 'png' });
+      await savePdfWithOptions({
+        scale: 12,
+        format: 'png',
+        maxExportDimension: 12000,
+        maxExportPixels: 120_000_000,
+        compressPdf: false,
+      });
     } catch (error) {
       console.error("Failed to save PDF:", error);
       const message = error instanceof Error ? error.message : String(error);
@@ -898,6 +948,7 @@ function App() {
           }}
           onDuplicatePage={handleDuplicatePage}
           onDeletePage={handleDeletePage}
+          onReorderPages={handleReorderPages}
         />
         
         {/* Main Canvas Area */}
