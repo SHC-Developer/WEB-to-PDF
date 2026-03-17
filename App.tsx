@@ -28,6 +28,8 @@ function App() {
   const [selectedElementIds, setSelectedElementIds] = useState<string[]>([]);
   const selectedElementId = selectedElementIds[0] ?? null;
   const [scale, setScale] = useState(1);
+  /** 실제 물리적 크기(100%)로 보이게 하는 기준 스케일. devicePixelRatio 반영 */
+  const [physicalScale, setPhysicalScale] = useState(() => Math.max(1, typeof window !== 'undefined' ? window.devicePixelRatio : 1));
   const [showGrid, setShowGrid] = useState(false);
   const [isDoublePage, setIsDoublePage] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -39,6 +41,21 @@ function App() {
   /** 프로젝트 저장 시 선택한 파일 핸들 (Ctrl+S 두 번째부터 같은 파일에 덮어쓰기) */
   const projectFileHandleRef = useRef<FileSystemFileHandle | null>(null);
   const dragCounterRef = useRef(0);
+
+  // 다중 모니터/배율 변경 시 물리적 크기 기준 스케일 갱신
+  useEffect(() => {
+    const updatePhysicalScale = () => {
+      setPhysicalScale(Math.max(1, window.devicePixelRatio));
+    };
+    updatePhysicalScale();
+    window.addEventListener('resize', updatePhysicalScale);
+    const mql = window.matchMedia('(resolution: 1dppx), (resolution: 2dppx), (min-resolution: 96dpi)');
+    if (mql.addEventListener) mql.addEventListener('change', updatePhysicalScale);
+    return () => {
+      window.removeEventListener('resize', updatePhysicalScale);
+      if (mql.removeEventListener) mql.removeEventListener('change', updatePhysicalScale);
+    };
+  }, []);
 
   // Helper to get active page
   const activePage = pages[activePageIndex];
@@ -688,6 +705,7 @@ function App() {
 
     for (let i = 0; i < pageElements.length; i++) {
       const pageEl = pageElements[i] as HTMLElement;
+      // devicePixelRatio 미사용: PC/모니터에 관계없이 동일한 PDF 이미지를 위해 옵션의 고정 scale만 사용
       const exportOptions = {
         cacheBust: true,
         pixelRatio: safeCaptureScale,
@@ -1010,7 +1028,7 @@ function App() {
         <Canvas 
           page={activePage}
           secondPage={secondPage}
-          scale={scale}
+          scale={scale * physicalScale}
           showGrid={showGrid}
           documentPreset={documentPreset}
           pageWidth={pageWidth}
