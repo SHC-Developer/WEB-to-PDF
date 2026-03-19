@@ -701,7 +701,13 @@ function App() {
     }
 
     const pageElements = Array.from(container.children);
-    const capturedImages: string[] = [];
+    const isLandscape = documentPreset === 'businessCard';
+    const pdf = new jsPDF({
+      orientation: isLandscape ? 'l' : 'p',
+      unit: 'mm',
+      format: [pageWidthMm, pageHeightMm],
+      compress: compressPdf,
+    });
 
     for (let i = 0; i < pageElements.length; i++) {
       const pageEl = pageElements[i] as HTMLElement;
@@ -711,27 +717,17 @@ function App() {
         pixelRatio: safeCaptureScale,
         width: pageWidth,
         height: pageHeight,
-        fontEmbedCSS: '',
       };
 
       const imageData = format === 'png'
         ? await toPng(pageEl, exportOptions)
         : await toJpeg(pageEl, { ...exportOptions, quality: jpegQuality });
 
-      capturedImages.push(imageData);
-    }
-
-    const isLandscape = documentPreset === 'businessCard';
-    const pdf = new jsPDF({
-      orientation: isLandscape ? 'l' : 'p',
-      unit: 'mm',
-      format: [pageWidthMm, pageHeightMm],
-      compress: compressPdf,
-    });
-
-    for (let i = 0; i < capturedImages.length; i++) {
       if (i > 0) pdf.addPage([pageWidthMm, pageHeightMm], isLandscape ? 'l' : 'p');
-      pdf.addImage(capturedImages[i], format === 'png' ? 'PNG' : 'JPEG', 0, 0, pageWidthMm, pageHeightMm);
+      pdf.addImage(imageData, format === 'png' ? 'PNG' : 'JPEG', 0, 0, pageWidthMm, pageHeightMm);
+
+      // 대형 프로젝트에서 문자열/메모리 폭증을 막기 위해 페이지별로 처리 후 이벤트 루프에 양보한다.
+      await new Promise(resolve => setTimeout(resolve, 0));
     }
 
     pdf.save(`project-${Date.now()}.pdf`);
@@ -754,16 +750,160 @@ function App() {
     try {
       setIsSaving(true);
       await savePdfWithOptions({
-        scale: 12,
-        format: 'png',
-        maxExportDimension: 12000,
-        maxExportPixels: 120_000_000,
-        compressPdf: false,
+        // 명함 기준 약 770dpi 수준으로, 인쇄 품질은 충분히 높이면서 메모리 폭증은 줄인다.
+        scale: 8,
+        format: 'jpeg',
+        jpegQuality: 0.98,
+        maxExportDimension: 8192,
+        maxExportPixels: 70_000_000,
+        compressPdf: true,
       });
     } catch (error) {
       console.error("Failed to save PDF:", error);
       const message = error instanceof Error ? error.message : String(error);
       alert(`PDF 저장 중 오류가 발생했습니다.\n${message}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  /** 명함 전용: 저화질 + 네 모서리 재단선(크롭마크)이 있는 PDF 저장 */
+  const handleSaveBusinessCardWithTrimMarks = async () => {
+    if (documentPreset !== 'businessCard') {
+      alert('명함 디자인 모드에서만 사용할 수 있습니다.');
+      return;
+    }
+    const TRIM_MARGIN_MM = 3;
+    const trimMargin = TRIM_MARGIN_MM;
+    const totalWidthMm = pageWidthMm + 2 * trimMargin;
+    const totalHeightMm = pageHeightMm + 2 * trimMargin;
+
+    try {
+      setIsSaving(true);
+      await new Promise(resolve => setTimeout(resolve, 100));
+      if ('fonts' in document) {
+        await (document as Document & { fonts: FontFaceSet }).fonts.ready;
+      }
+
+      const container = document.getElementById('pdf-export-container');
+      if (!container) {
+        console.error("PDF container not found");
+        return;
+      }
+
+      const pageElements = Array.from(container.children);
+      const pdf = new jsPDF({
+        orientation: 'l',
+        unit: 'mm',
+        format: [totalWidthMm, totalHeightMm],
+        compress: true,
+      });
+
+      const exportOptions = {
+        cacheBust: true,
+        pixelRatio: 2,
+        width: pageWidth,
+        height: pageHeight,
+      };
+
+      for (let i = 0; i < pageElements.length; i++) {
+        const pageEl = pageElements[i] as HTMLElement;
+        const imageData = await toJpeg(pageEl, { ...exportOptions, quality: 0.8 });
+
+        if (i > 0) pdf.addPage([totalWidthMm, totalHeightMm], 'l');
+        pdf.addImage(imageData, 'JPEG', trimMargin, trimMargin, pageWidthMm, pageHeightMm);
+
+        // 웹에디터 1mm 안전 여백 가이드를 검정색으로 표기
+        pdf.setDrawColor(0, 0, 0);
+        pdf.setLineWidth(0.15);
+        const m = trimMargin;
+        const w = pageWidthMm;
+        const h = pageHeightMm;
+        const safeInsetMm = 1;
+        pdf.rect(m + safeInsetMm, m + safeInsetMm, w - 2 * safeInsetMm, h - 2 * safeInsetMm, 'S');
+
+        await new Promise(resolve => setTimeout(resolve, 0));
+      }
+
+      pdf.save(`business-card-trim-${Date.now()}.pdf`);
+    } catch (error) {
+      console.error("Failed to save business card PDF:", error);
+      const message = error instanceof Error ? error.message : String(error);
+      alert(`명함 PDF 저장 중 오류가 발생했습니다.\n${message}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  /** 명함 전용: 고화질 + 네 모서리 재단선(크롭마크)이 있는 PDF 저장 */
+  const handleSaveBusinessCardWithTrimMarksHighQuality = async () => {
+    if (documentPreset !== 'businessCard') {
+      alert('명함 디자인 모드에서만 사용할 수 있습니다.');
+      return;
+    }
+    const TRIM_MARGIN_MM = 3;
+    const trimMargin = TRIM_MARGIN_MM;
+    const totalWidthMm = pageWidthMm + 2 * trimMargin;
+    const totalHeightMm = pageHeightMm + 2 * trimMargin;
+    const captureScale = 8;
+    const maxExportDimension = 8192;
+    const maxExportPixels = 70_000_000;
+    const safeScaleByDimension = Math.min(maxExportDimension / pageWidth, maxExportDimension / pageHeight);
+    const safeScaleByArea = Math.sqrt(maxExportPixels / (pageWidth * pageHeight));
+    const safeCaptureScale = Math.max(1, Math.min(captureScale, safeScaleByDimension, safeScaleByArea));
+
+    try {
+      setIsSaving(true);
+      await new Promise(resolve => setTimeout(resolve, 100));
+      if ('fonts' in document) {
+        await (document as Document & { fonts: FontFaceSet }).fonts.ready;
+      }
+
+      const container = document.getElementById('pdf-export-container');
+      if (!container) {
+        console.error("PDF container not found");
+        return;
+      }
+
+      const pageElements = Array.from(container.children);
+      const pdf = new jsPDF({
+        orientation: 'l',
+        unit: 'mm',
+        format: [totalWidthMm, totalHeightMm],
+        compress: true,
+      });
+
+      const exportOptions = {
+        cacheBust: true,
+        pixelRatio: safeCaptureScale,
+        width: pageWidth,
+        height: pageHeight,
+      };
+
+      for (let i = 0; i < pageElements.length; i++) {
+        const pageEl = pageElements[i] as HTMLElement;
+        const imageData = await toJpeg(pageEl, { ...exportOptions, quality: 0.98 });
+
+        if (i > 0) pdf.addPage([totalWidthMm, totalHeightMm], 'l');
+        pdf.addImage(imageData, 'JPEG', trimMargin, trimMargin, pageWidthMm, pageHeightMm);
+
+        // 웹에디터 1mm 안전 여백 가이드를 검정색으로 표기
+        pdf.setDrawColor(0, 0, 0);
+        pdf.setLineWidth(0.15);
+        const m = trimMargin;
+        const w = pageWidthMm;
+        const h = pageHeightMm;
+        const safeInsetMm = 1;
+        pdf.rect(m + safeInsetMm, m + safeInsetMm, w - 2 * safeInsetMm, h - 2 * safeInsetMm, 'S');
+
+        await new Promise(resolve => setTimeout(resolve, 0));
+      }
+
+      pdf.save(`business-card-trim-hq-${Date.now()}.pdf`);
+    } catch (error) {
+      console.error("Failed to save business card PDF (high quality):", error);
+      const message = error instanceof Error ? error.message : String(error);
+      alert(`명함 PDF 저장 중 오류가 발생했습니다.\n${message}`);
     } finally {
       setIsSaving(false);
     }
@@ -981,6 +1121,8 @@ function App() {
         onUndo={undo} onRedo={redo}
         onSaveNormalQuality={handleSaveNormalQuality}
         onSaveHighQuality={handleSaveHighQuality}
+        onSaveBusinessCardWithTrimMarks={handleSaveBusinessCardWithTrimMarks}
+        onSaveBusinessCardWithTrimMarksHighQuality={handleSaveBusinessCardWithTrimMarksHighQuality}
         onSaveProject={handleSaveProject}
         isSaving={isSaving}
         documentPreset={documentPreset}

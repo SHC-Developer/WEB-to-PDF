@@ -13,6 +13,8 @@ interface ToolbarProps {
   onRedo: () => void;
   onSaveNormalQuality?: () => void;
   onSaveHighQuality?: () => void;
+  onSaveBusinessCardWithTrimMarks?: () => void;
+  onSaveBusinessCardWithTrimMarksHighQuality?: () => void;
   onSaveProject?: () => void;
   isSaving?: boolean;
   documentPreset?: DocumentPreset;
@@ -32,6 +34,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   onUndo, onRedo,
   onSaveNormalQuality,
   onSaveHighQuality,
+  onSaveBusinessCardWithTrimMarks,
+  onSaveBusinessCardWithTrimMarksHighQuality,
   onSaveProject,
   isSaving = false,
   documentPreset = 'a4',
@@ -180,6 +184,30 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             title="PDF 일반화질 저장"
           >
             {isSaving ? '저장 중...' : '일반화질 저장'}
+          </button>
+        )}
+        {documentPreset === 'businessCard' && onSaveBusinessCardWithTrimMarks && (
+          <button
+            onClick={onSaveBusinessCardWithTrimMarks}
+            disabled={isSaving}
+            className={`px-4 py-2 rounded font-medium text-sm border transition-colors flex items-center gap-2
+              ${isSaving ? 'bg-gray-200 border-gray-200 cursor-not-allowed text-gray-500' : 'border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100'}
+            `}
+            title="저화질 PDF + 재단선(크롭마크) 저장"
+          >
+            {isSaving ? '저장 중...' : '명함저장'}
+          </button>
+        )}
+        {documentPreset === 'businessCard' && onSaveBusinessCardWithTrimMarksHighQuality && (
+          <button
+            onClick={onSaveBusinessCardWithTrimMarksHighQuality}
+            disabled={isSaving}
+            className={`px-4 py-2 rounded font-medium text-sm border transition-colors flex items-center gap-2
+              ${isSaving ? 'bg-gray-200 border-gray-200 cursor-not-allowed text-gray-500' : 'border-amber-300 bg-amber-100 text-amber-900 hover:bg-amber-200'}
+            `}
+            title="고화질 PDF + 재단선(크롭마크) 저장"
+          >
+            {isSaving ? '저장 중...' : '명함저장(고화질)'}
           </button>
         )}
         {onSaveHighQuality && (

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Page, EditorElement, DocumentPreset } from '../types';
-import { FONT_FAMILY_CSS, PRESET_SIZES } from '../constants';
+import { FONT_FAMILY_CSS } from '../constants';
 import { Icons } from './Icons';
 import { ShapeRenderer } from './ShapeRenderer';
 import { LineRenderer } from './LineRenderer';
@@ -29,6 +29,27 @@ interface SnapLine {
   /** Figma 스타일: 스냅된 라인 기준 우(또는 하) 쪽 간격 px */
   gapEnd?: number;
 }
+
+const DEFAULT_GRID_OVERLAY_STYLE: React.CSSProperties = {
+  backgroundImage: [
+    'radial-gradient(circle at 0.5px 0.5px, rgba(148, 163, 184, 0.3) 0.35px, transparent 0.45px)',
+    'linear-gradient(rgba(148, 163, 184, 0.12) 1px, transparent 1px)',
+    'linear-gradient(90deg, rgba(148, 163, 184, 0.12) 1px, transparent 1px)',
+    'linear-gradient(rgba(148, 163, 184, 0.24) 1px, transparent 1px)',
+    'linear-gradient(90deg, rgba(148, 163, 184, 0.24) 1px, transparent 1px)',
+  ].join(', '),
+  backgroundSize: '1px 1px, 5px 5px, 5px 5px, 20px 20px, 20px 20px',
+  backgroundPosition: '0 0, 0 0, 0 0, 0 0, 0 0',
+};
+
+const BUSINESS_CARD_GRID_OVERLAY_STYLE: React.CSSProperties = {
+  backgroundImage: [
+    'linear-gradient(rgba(148, 163, 184, 0.2) 1px, transparent 1px)',
+    'linear-gradient(90deg, rgba(148, 163, 184, 0.2) 1px, transparent 1px)',
+  ].join(', '),
+  backgroundSize: '5px 5px, 5px 5px',
+  backgroundPosition: '0 0, 0 0',
+};
 
 export const Canvas: React.FC<CanvasProps> = ({ 
   page,
@@ -805,6 +826,25 @@ export const Canvas: React.FC<CanvasProps> = ({
     );
   };
 
+  const renderGridOverlay = () => (
+    <>
+      {shouldShowBusinessCardSafeGuide ? (
+        <div
+          className="absolute pointer-events-none z-0"
+          style={{
+            left: safeInset,
+            top: safeInset,
+            width: businessCardContentWidth,
+            height: businessCardContentHeight,
+            ...gridOverlayStyle,
+          }}
+        />
+      ) : (
+        <div className="absolute inset-0 pointer-events-none z-0" style={gridOverlayStyle} />
+      )}
+    </>
+  );
+
   // Marquee: start on page empty area mousedown
   const handlePageMouseDown = (e: React.MouseEvent, pageId: string) => {
     if ((e.target as HTMLElement).closest('.element-wrapper')) return;
@@ -860,10 +900,13 @@ export const Canvas: React.FC<CanvasProps> = ({
   const totalContentHeight = pageHeight;
   const scaledWidth = scale * totalContentWidth;
   const scaledHeight = scale * totalContentHeight;
-  const presetSize = PRESET_SIZES[documentPreset];
-  const safeInsetX = pageWidth / presetSize.widthMm;
-  const safeInsetY = pageHeight / presetSize.heightMm;
+  const safeInset = 4;
+  const businessCardContentWidth = pageWidth - safeInset * 2;
+  const businessCardContentHeight = pageHeight - safeInset * 2;
   const shouldShowBusinessCardSafeGuide = documentPreset === 'businessCard';
+  const gridOverlayStyle = shouldShowBusinessCardSafeGuide
+    ? BUSINESS_CARD_GRID_OVERLAY_STYLE
+    : DEFAULT_GRID_OVERLAY_STYLE;
 
   /** 피그마처럼 항상 상하좌우 스크롤 가능한 무한 캔버스 공간 크기 */
   const INFINITE_CANVAS_SIZE = 10000;
@@ -911,23 +954,15 @@ export const Canvas: React.FC<CanvasProps> = ({
             if ((e.target as HTMLElement).closest('.element-wrapper')) e.stopPropagation();
           }}
         >
-          {showGrid && (
-            <div className="absolute inset-0 pointer-events-none z-0" 
-                 style={{ 
-                   backgroundImage: 'linear-gradient(#ddd 1px, transparent 1px), linear-gradient(90deg, #ddd 1px, transparent 1px)', 
-                   backgroundSize: '20px 20px' 
-                 }} 
-            />
-          )}
-          {showGrid && <div className="absolute top-0 left-0 w-full h-4 bg-gray-100 border-b border-gray-300 z-0 text-[8px] flex items-end px-1 text-gray-400">0px</div>}
+          {showGrid && renderGridOverlay()}
           {shouldShowBusinessCardSafeGuide && (
             <div
               className="absolute pointer-events-none z-[1]"
               style={{
-                left: safeInsetX,
-                top: safeInsetY,
-                width: pageWidth - safeInsetX * 2,
-                height: pageHeight - safeInsetY * 2,
+                left: safeInset,
+                top: safeInset,
+                width: businessCardContentWidth,
+                height: businessCardContentHeight,
                 border: '1px dashed rgba(34, 211, 238, 0.55)',
               }}
             />
@@ -975,22 +1010,15 @@ export const Canvas: React.FC<CanvasProps> = ({
               if ((e.target as HTMLElement).closest('.element-wrapper')) e.stopPropagation();
             }}
           >
-             {showGrid && (
-              <div className="absolute inset-0 pointer-events-none z-0" 
-                  style={{ 
-                    backgroundImage: 'linear-gradient(#ddd 1px, transparent 1px), linear-gradient(90deg, #ddd 1px, transparent 1px)', 
-                    backgroundSize: '20px 20px' 
-                  }} 
-              />
-            )}
+            {showGrid && renderGridOverlay()}
           {shouldShowBusinessCardSafeGuide && (
             <div
               className="absolute pointer-events-none z-[1]"
               style={{
-                left: safeInsetX,
-                top: safeInsetY,
-                width: pageWidth - safeInsetX * 2,
-                height: pageHeight - safeInsetY * 2,
+                left: safeInset,
+                top: safeInset,
+                width: businessCardContentWidth,
+                height: businessCardContentHeight,
                 border: '1px dashed rgba(34, 211, 238, 0.55)',
               }}
             />

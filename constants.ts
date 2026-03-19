@@ -3,7 +3,7 @@ import { Page, DocumentPreset } from './types';
 /** 문서 크기 프리셋 (재export) */
 export type { DocumentPreset };
 
-/** 프리셋별 크기 (mm, 96 DPI px) */
+/** 96 DPI: 1mm = 96/25.4 px. 명함 92×52mm → 348×197 px (가장 근접한 정수) */
 export const PRESET_SIZES: Record<DocumentPreset, { widthMm: number; heightMm: number; widthPx: number; heightPx: number }> = {
   a4:          { widthMm: 210,  heightMm: 297,  widthPx: 794,  heightPx: 1123 },
   businessCard: { widthMm: 92,   heightMm: 52,   widthPx: 348,  heightPx: 197  },
@@ -24,7 +24,7 @@ export const FONT_FAMILY_CSS: Record<string, string> = {
   Dotum: '"Dotum", "돋움", sans-serif',
   Gulim: '"Gulim", "굴림", sans-serif',
   Gungsuh: '"Gungsuh", "궁서", serif',
-  'HY신명조': '"HY신명조", "HY Shin MyeongJo", serif',
+  'HY신명조': '"HYMyeongJoEmbedded", "HY신명조", "HY Shin MyeongJo", serif',
   NanumMyeongjo: '"NanumMyeongjo", "Nanum Myeongjo", serif',
   Arial: 'Arial, sans-serif',
   'Times New Roman': '"Times New Roman", serif',
@@ -43,7 +43,7 @@ export const FONT_FAMILY_OPTIONS: { value: string; label: string }[] = [
   { value: 'Noto Sans KR', label: 'Noto Sans KR' },
   { value: 'Pretendard', label: 'Pretendard' },
   { value: 'NanumGothic', label: '나눔고딕' },
-  { value: 'HY신명조', label: 'HY신명조' },
+  { value: 'HY신명조', label: '조선신명조' },
   { value: 'Batang', label: '바탕' },
   { value: 'Dotum', label: '돋움' },
   { value: 'Gulim', label: '굴림' },

@@ -1,0 +1,21 @@
+@font-face {
+  font-family: "HYMyeongJoEmbedded";
+  src:
+    url("/fonts/ChosunSm.TTF") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "HYMyeongJoEmbedded";
+  src:
+    url("/fonts/ChosunKm.TTF") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: block;
+}
+
+body {
+  font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+}
